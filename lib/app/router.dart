@@ -7,6 +7,9 @@ import '../features/auth/screens/signin_screen.dart';
 import '../features/auth/screens/create_profile_screen.dart';
 import '../features/location/screens/set_location_screen.dart';
 import '../features/home/screens/home_screen.dart';
+import '../features/scan/screens/scan_screen.dart';
+import '../features/scan/screens/disposal_instructions_screen.dart';
+import '../features/scan/screens/confirmation_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -45,6 +48,31 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ScanScreen(),
     ),
     GoRoute(
+      path: '/disposal-instructions',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final imagePath = extra?['imagePath'] as String?;
+        if (imagePath == null) {
+          return const Scaffold(
+            body: Center(child: Text('Image path not provided')),
+          );
+        }
+        return DisposalInstructionsScreen(imagePath: imagePath);
+      },
+    ),
+    GoRoute(
+      path: '/confirmation',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final category = extra?['category'] as String? ?? 'Unknown';
+        final points = extra?['points'] as int? ?? 0;
+        return ConfirmationScreen(
+          category: category,
+          points: points,
+        );
+      },
+    ),
+    GoRoute(
       path: '/leaderboard',
       builder: (context, state) => const LeaderboardScreen(),
     ),
@@ -54,22 +82,6 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
-
-// Placeholder screens for routes that will be implemented later
-class ScanScreen extends StatelessWidget {
-  const ScanScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scan Item')),
-      body: const Center(
-        child: Text('Scan Screen - Coming Soon'),
-      ),
-    );
-  }
-}
-
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 
