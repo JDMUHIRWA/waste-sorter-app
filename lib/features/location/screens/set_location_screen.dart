@@ -134,7 +134,7 @@ class _SetLocationScreenState extends State<SetLocationScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.1),
+                        color: AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppRadius.lg),
                         border: Border.all(color: AppColors.success),
                       ),
