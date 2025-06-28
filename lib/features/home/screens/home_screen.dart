@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentIndex = index;
     });
-    
+
     switch (index) {
       case 0:
         // Home - already here
@@ -134,8 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(AppRadius.md),
+                                  color:
+                                      AppColors.primary.withOpacity(0.1),
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.md),
                                 ),
                                 child: const Icon(
                                   Icons.recycling,
@@ -189,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(AppRadius.circular),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.3),
+              color: AppColors.primary.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

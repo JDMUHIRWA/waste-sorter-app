@@ -5,14 +5,15 @@ import '../../../core/constants/app_constants.dart';
 
 class DisposalInstructionsScreen extends StatefulWidget {
   final String imagePath;
-  
+
   const DisposalInstructionsScreen({
     super.key,
     required this.imagePath,
   });
 
   @override
-  State<DisposalInstructionsScreen> createState() => _DisposalInstructionsScreenState();
+  State<DisposalInstructionsScreen> createState() =>
+      _DisposalInstructionsScreenState();
 }
 
 class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
@@ -33,16 +34,16 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _simulateAnalysis();
   }
 
   Future<void> _simulateAnalysis() async {
     _progressController.forward();
-    
+
     // Simulate AI processing time
     await Future.delayed(const Duration(seconds: 3));
-    
+
     // Mock classification result
     setState(() {
       _isAnalyzing = false;
@@ -60,7 +61,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         'environmentalImpact': {
           'co2Saved': '0.2 kg',
           'energySaved': '1.5 kWh',
-          'description': 'Recycling this bottle saves energy equivalent to running a 60W bulb for 25 hours!'
+          'description':
+              'Recycling this bottle saves energy equivalent to running a 60W bulb for 25 hours!'
         },
         'alternativeUses': [
           'Plant pot for small herbs',
@@ -69,7 +71,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         ]
       };
     });
-    
+
     _slideController.forward();
   }
 
@@ -125,7 +127,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withValues(alpha: 0.1),
+            AppColors.primary.withOpacity(0.1),
             AppColors.background,
           ],
         ),
@@ -155,9 +157,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   const SizedBox(width: 48),
                 ],
               ),
-              
+
               const Spacer(),
-              
+
               // Captured Image
               Container(
                 width: 250,
@@ -166,7 +168,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -180,9 +182,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Progress Animation
               AnimatedBuilder(
                 animation: _progressController,
@@ -197,7 +199,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: AppColors.primary.withOpacity(0.3),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -209,21 +211,18 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           size: 30,
                         ),
                       ),
-                      
                       const SizedBox(height: 24),
-                      
                       SizedBox(
                         width: 200,
                         child: LinearProgressIndicator(
                           value: _progressController.value,
                           backgroundColor: Colors.grey[300],
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.primary),
                           minHeight: 6,
                         ),
                       ),
-                      
                       const SizedBox(height: 16),
-                      
                       Text(
                         '${(_progressController.value * 100).toInt()}%',
                         style: const TextStyle(
@@ -232,9 +231,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           color: AppColors.primary,
                         ),
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       const Text(
                         'AI is analyzing your waste item...',
                         style: TextStyle(
@@ -247,7 +244,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   );
                 },
               ),
-              
+
               const Spacer(),
             ],
           ),
@@ -259,14 +256,14 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   Widget _buildResultState() {
     final result = _classificationResult!;
     final categoryColor = _getCategoryColor(result['category']);
-    
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            categoryColor.withValues(alpha: 0.1),
+            categoryColor.withOpacity(0.1),
             AppColors.background,
           ],
         ),
@@ -302,7 +299,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                 ],
               ),
             ),
-            
+
             Expanded(
               child: SlideTransition(
                 position: Tween<Offset>(
@@ -326,7 +323,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -347,9 +344,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                 size: 40,
                               ),
                             ),
-                            
                             const SizedBox(height: 16),
-                            
                             Text(
                               result['category'],
                               style: TextStyle(
@@ -358,7 +353,6 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                 color: categoryColor,
                               ),
                             ),
-                            
                             Text(
                               result['itemType'],
                               style: const TextStyle(
@@ -366,16 +360,14 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                 color: AppColors.textSecondary,
                               ),
                             ),
-                            
                             const SizedBox(height: 16),
-                            
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: categoryColor.withValues(alpha: 0.1),
+                                color: categoryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -389,9 +381,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Disposal Instructions
                       _buildSection(
                         'Disposal Instructions',
@@ -402,12 +394,14 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                               .map<Widget>((instruction) => Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Container(
                                           width: 8,
                                           height: 8,
-                                          margin: const EdgeInsets.only(top: 6, right: 12),
+                                          margin: const EdgeInsets.only(
+                                              top: 6, right: 12),
                                           decoration: BoxDecoration(
                                             color: categoryColor,
                                             shape: BoxShape.circle,
@@ -428,9 +422,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                               .toList(),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Environmental Impact
                       _buildSection(
                         'Environmental Impact',
@@ -451,7 +445,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                 Expanded(
                                   child: _buildImpactMetric(
                                     'Energy Saved',
-                                    result['environmentalImpact']['energySaved'],
+                                    result['environmentalImpact']
+                                        ['energySaved'],
                                     Icons.flash_on,
                                   ),
                                 ),
@@ -469,9 +464,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Alternative Uses
                       _buildSection(
                         'Creative Reuse Ideas',
@@ -492,7 +487,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                         Expanded(
                                           child: Text(
                                             use,
-                                            style: const TextStyle(fontSize: 14),
+                                            style:
+                                                const TextStyle(fontSize: 14),
                                           ),
                                         ),
                                       ],
@@ -501,9 +497,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                               .toList(),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Action Buttons
                       Row(
                         children: [
@@ -518,7 +514,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: categoryColor,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -537,7 +534,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                             onPressed: () => context.pop(),
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: categoryColor),
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 20),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -566,7 +564,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -599,7 +597,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

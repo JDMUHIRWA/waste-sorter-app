@@ -84,17 +84,10 @@ class WelcomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                         ),
                       ),
-                      icon: Image.asset(
-                        'assets/icons/google.png',
-                        width: 20,
-                        height: 20,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.g_mobiledata,
-                            size: 20,
-                            color: AppColors.google,
-                          );
-                        },
+                      icon: const Icon(
+                        Icons.g_mobiledata,
+                        size: 20,
+                        color: AppColors.google,
                       ),
                       label: const Text(
                         'Continue with Google',

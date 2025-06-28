@@ -82,6 +82,7 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 

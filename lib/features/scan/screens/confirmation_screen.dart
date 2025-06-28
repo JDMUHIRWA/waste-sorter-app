@@ -5,7 +5,7 @@ import '../../../core/constants/app_constants.dart';
 class ConfirmationScreen extends StatefulWidget {
   final String category;
   final int points;
-  
+
   const ConfirmationScreen({
     super.key,
     required this.category,
@@ -21,36 +21,36 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
   late AnimationController _scaleController;
   late AnimationController _slideController;
   late AnimationController _pointsController;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    
+
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _pointsController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _startAnimations();
   }
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 200));
     _scaleController.forward();
-    
+
     await Future.delayed(const Duration(milliseconds: 300));
     _slideController.forward();
-    
+
     await Future.delayed(const Duration(milliseconds: 400));
     _pointsController.forward();
   }
@@ -111,7 +111,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
   @override
   Widget build(BuildContext context) {
     final categoryColor = _getCategoryColor(widget.category);
-    
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -119,9 +119,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              categoryColor.withValues(alpha: 0.1),
+              categoryColor.withOpacity(0.1),
               AppColors.background,
-              categoryColor.withValues(alpha: 0.05),
+              categoryColor.withOpacity(0.05),
             ],
           ),
         ),
@@ -144,9 +144,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                     ),
                   ],
                 ),
-                
+
                 const Spacer(),
-                
+
                 // Success Animation
                 ScaleTransition(
                   scale: CurvedAnimation(
@@ -161,7 +161,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: categoryColor.withValues(alpha: 0.3),
+                          color: categoryColor.withOpacity(0.3),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
@@ -174,9 +174,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Title
                 SlideTransition(
                   position: Tween<Offset>(
@@ -199,9 +199,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        
                         const SizedBox(height: 16),
-                        
                         Text(
                           _getSuccessMessage(widget.category),
                           style: const TextStyle(
@@ -215,9 +213,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Points Animation
                 AnimatedBuilder(
                   animation: _pointsController,
@@ -237,7 +235,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -252,9 +250,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                                 color: AppColors.textSecondary,
                               ),
                             ),
-                            
                             const SizedBox(height: 8),
-                            
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -274,16 +270,14 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                                 ),
                               ],
                             ),
-                            
                             const SizedBox(height: 16),
-                            
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: categoryColor.withValues(alpha: 0.1),
+                                color: categoryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -310,9 +304,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Stats Summary
                 SlideTransition(
                   position: Tween<Offset>(
@@ -325,7 +319,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: categoryColor.withValues(alpha: 0.1),
+                      color: categoryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -340,7 +334,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                         Container(
                           width: 1,
                           height: 40,
-                          color: categoryColor.withValues(alpha: 0.3),
+                          color: categoryColor.withOpacity(0.3),
                         ),
                         Expanded(
                           child: _buildStatItem(
@@ -352,7 +346,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                         Container(
                           width: 1,
                           height: 40,
-                          color: categoryColor.withValues(alpha: 0.3),
+                          color: categoryColor.withOpacity(0.3),
                         ),
                         Expanded(
                           child: _buildStatItem(
@@ -365,9 +359,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                     ),
                   ),
                 ),
-                
+
                 const Spacer(),
-                
+
                 // Action Buttons
                 SlideTransition(
                   position: Tween<Offset>(
@@ -400,9 +394,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                           ),
                         ),
                       ),
-                      
                       const SizedBox(height: 12),
-                      
                       Row(
                         children: [
                           Expanded(
@@ -410,7 +402,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                               onPressed: () => context.go('/leaderboard'),
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(color: categoryColor),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -424,9 +417,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                               ),
                             ),
                           ),
-                          
                           const SizedBox(width: 12),
-                          
                           Expanded(
                             child: TextButton(
                               onPressed: () => context.go('/home'),

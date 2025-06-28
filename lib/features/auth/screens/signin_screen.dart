@@ -89,7 +89,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderSide:
+                          BorderSide(color: AppColors.primary, width: 2),
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
                     contentPadding: EdgeInsets.symmetric(
@@ -135,7 +136,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
                     focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderSide:
+                          BorderSide(color: AppColors.primary, width: 2),
                       borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
                     contentPadding: const EdgeInsets.symmetric(

@@ -59,7 +59,8 @@ class _ScanScreenState extends State<ScanScreen> {
       final XFile image = await _cameraController!.takePicture();
       // Navigate to disposal instructions with the captured image
       if (mounted) {
-        context.push('/disposal-instructions', extra: {'imagePath': image.path});
+        context
+            .push('/disposal-instructions', extra: {'imagePath': image.path});
       }
     } catch (e) {
       setState(() {
@@ -82,9 +83,10 @@ class _ScanScreenState extends State<ScanScreen> {
         source: ImageSource.gallery,
         imageQuality: 80,
       );
-      
+
       if (image != null && mounted) {
-        context.push('/disposal-instructions', extra: {'imagePath': image.path});
+        context
+            .push('/disposal-instructions', extra: {'imagePath': image.path});
       }
     } catch (e) {
       setState(() {
@@ -131,7 +133,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.7),
+                    Colors.black.withOpacity(0.7),
                     Colors.transparent,
                   ],
                 ),
@@ -177,7 +179,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.8),
+                    Colors.black.withOpacity(0.8),
                     Colors.transparent,
                   ],
                 ),
@@ -200,7 +202,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    
+
                     // Camera Controls
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -212,10 +214,10 @@ class _ScanScreenState extends State<ScanScreen> {
                             width: 60,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -234,8 +236,8 @@ class _ScanScreenState extends State<ScanScreen> {
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: _isLoading 
-                                  ? Colors.grey.withValues(alpha: 0.5)
+                              color: _isLoading
+                                  ? Colors.grey.withOpacity(0.5)
                                   : AppColors.primary,
                               shape: BoxShape.circle,
                               border: Border.all(
@@ -244,7 +246,8 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color:
+                                      AppColors.primary.withOpacity(0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
@@ -272,10 +275,10 @@ class _ScanScreenState extends State<ScanScreen> {
                             width: 60,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -319,8 +322,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           height: 20,
                           decoration: BoxDecoration(
                             border: Border(
-                              top: BorderSide(color: AppColors.primary, width: 3),
-                              left: BorderSide(color: AppColors.primary, width: 3),
+                              top: BorderSide(
+                                  color: AppColors.primary, width: 3),
+                              left: BorderSide(
+                                  color: AppColors.primary, width: 3),
                             ),
                           ),
                         ),
@@ -333,8 +338,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           height: 20,
                           decoration: BoxDecoration(
                             border: Border(
-                              top: BorderSide(color: AppColors.primary, width: 3),
-                              right: BorderSide(color: AppColors.primary, width: 3),
+                              top: BorderSide(
+                                  color: AppColors.primary, width: 3),
+                              right: BorderSide(
+                                  color: AppColors.primary, width: 3),
                             ),
                           ),
                         ),
@@ -347,8 +354,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           height: 20,
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: AppColors.primary, width: 3),
-                              left: BorderSide(color: AppColors.primary, width: 3),
+                              bottom: BorderSide(
+                                  color: AppColors.primary, width: 3),
+                              left: BorderSide(
+                                  color: AppColors.primary, width: 3),
                             ),
                           ),
                         ),
@@ -361,8 +370,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           height: 20,
                           decoration: BoxDecoration(
                             border: Border(
-                              bottom: BorderSide(color: AppColors.primary, width: 3),
-                              right: BorderSide(color: AppColors.primary, width: 3),
+                              bottom: BorderSide(
+                                  color: AppColors.primary, width: 3),
+                              right: BorderSide(
+                                  color: AppColors.primary, width: 3),
                             ),
                           ),
                         ),
