@@ -36,15 +36,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Profile Section
             _buildProfileSection(),
             const SizedBox(height: 32),
-            
+
             // App Preferences
             _buildPreferencesSection(),
             const SizedBox(height: 32),
-            
+
             // Support Section
             _buildSupportSection(),
             const SizedBox(height: 32),
-            
+
             // Account Management
             _buildAccountSection(),
             const SizedBox(height: 32),
@@ -110,7 +110,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.success.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -446,7 +447,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text('Version: 1.0.0'),
             SizedBox(height: 8),
-            Text('WasteSorter helps you classify and dispose of waste properly, contributing to a cleaner environment.'),
+            Text(
+                'WasteSorter helps you classify and dispose of waste properly, contributing to a cleaner environment.'),
             SizedBox(height: 16),
             Text('Made with ❤️ for the planet'),
           ],

@@ -18,7 +18,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     LeaderboardUser(rank: 2, name: "Sarah Johnson", points: 2320, avatar: "🏆"),
     LeaderboardUser(rank: 3, name: "Mike Wilson", points: 2180, avatar: "⭐"),
     LeaderboardUser(rank: 4, name: "Emma Davis", points: 1950, avatar: "🌍"),
-    LeaderboardUser(rank: 5, name: "You", points: 1820, avatar: "👤", isCurrentUser: true),
+    LeaderboardUser(
+        rank: 5, name: "You", points: 1820, avatar: "👤", isCurrentUser: true),
     LeaderboardUser(rank: 6, name: "James Brown", points: 1750, avatar: "♻️"),
     LeaderboardUser(rank: 7, name: "Lisa Garcia", points: 1680, avatar: "🌱"),
     LeaderboardUser(rank: 8, name: "David Lee", points: 1590, avatar: "🌿"),
@@ -27,7 +28,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   final List<LeaderboardUser> monthlyRankings = [
     LeaderboardUser(rank: 1, name: "Sarah Johnson", points: 8950, avatar: "🏆"),
     LeaderboardUser(rank: 2, name: "Alex Chen", points: 8720, avatar: "🌟"),
-    LeaderboardUser(rank: 3, name: "You", points: 7640, avatar: "👤", isCurrentUser: true),
+    LeaderboardUser(
+        rank: 3, name: "You", points: 7640, avatar: "👤", isCurrentUser: true),
     LeaderboardUser(rank: 4, name: "Emma Davis", points: 7320, avatar: "🌍"),
     LeaderboardUser(rank: 5, name: "Mike Wilson", points: 6890, avatar: "⭐"),
     LeaderboardUser(rank: 6, name: "James Brown", points: 6450, avatar: "♻️"),
@@ -92,7 +94,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           padding: const EdgeInsets.all(20),
           child: _buildPodium(users.take(3).toList()),
         ),
-        
+
         // Rest of the rankings
         Expanded(
           child: ListView.builder(
@@ -189,9 +191,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: user.isCurrentUser ? AppColors.primary.withOpacity(0.1) : Colors.white,
+        color: user.isCurrentUser
+            ? AppColors.primary.withOpacity(0.1)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: user.isCurrentUser 
+        border: user.isCurrentUser
             ? Border.all(color: AppColors.primary, width: 2)
             : null,
         boxShadow: [
@@ -209,8 +213,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: user.isCurrentUser 
-                  ? AppColors.primary 
+              color: user.isCurrentUser
+                  ? AppColors.primary
                   : AppColors.textSecondary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
@@ -218,7 +222,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               child: Text(
                 '#${user.rank}',
                 style: TextStyle(
-                  color: user.isCurrentUser ? Colors.white : AppColors.textSecondary,
+                  color: user.isCurrentUser
+                      ? Colors.white
+                      : AppColors.textSecondary,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -226,7 +232,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Avatar
           Container(
             width: 50,
@@ -243,7 +249,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Name and points
           Expanded(
             child: Column(
@@ -254,8 +260,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: user.isCurrentUser 
-                        ? AppColors.primary 
+                    color: user.isCurrentUser
+                        ? AppColors.primary
                         : AppColors.textPrimary,
                   ),
                 ),
@@ -270,7 +276,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ],
             ),
           ),
-          
+
           // Badge for current user
           if (user.isCurrentUser)
             Container(
