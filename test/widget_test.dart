@@ -30,7 +30,8 @@ void main() {
           // If it's a minor overflow (less than expected), log but don't fail
           if (exception.toString().contains('overflowed') && 
               !exception.toString().contains('overflowed by more than 200 pixels')) {
-            print('Minor overflow detected but within acceptable range: $exception');
+            // Minor overflow detected but within acceptable range for testing
+            debugPrint('Minor overflow detected but within acceptable range: $exception');
           } else {
             throw exception;
           }
