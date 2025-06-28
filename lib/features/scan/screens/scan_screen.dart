@@ -246,8 +246,7 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color:
-                                      AppColors.primary.withOpacity(0.3),
+                                  color: AppColors.primary.withOpacity(0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
