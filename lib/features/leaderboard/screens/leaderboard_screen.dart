@@ -135,7 +135,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 2),
           ),
@@ -192,7 +192,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: user.isCurrentUser
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withValues(alpha: 0.1)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: user.isCurrentUser
@@ -200,7 +200,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -215,7 +215,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             decoration: BoxDecoration(
               color: user.isCurrentUser
                   ? AppColors.primary
-                  : AppColors.textSecondary.withOpacity(0.1),
+                  : AppColors.textSecondary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -238,7 +238,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(

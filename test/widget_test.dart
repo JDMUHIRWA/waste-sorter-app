@@ -8,5 +8,8 @@ void main() {
 
     // Verify the app builds without errors
     expect(find.byType(WasteSorterApp), findsOneWidget);
+    
+    // Wait for any pending timers (like splash screen navigation)
+    await tester.pumpAndSettle(const Duration(seconds: 5));
   });
 }

@@ -119,9 +119,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              categoryColor.withOpacity(0.1),
+              categoryColor.withValues(alpha: 0.1),
               AppColors.background,
-              categoryColor.withOpacity(0.05),
+              categoryColor.withValues(alpha: 0.05),
             ],
           ),
         ),
@@ -161,7 +161,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: categoryColor.withOpacity(0.3),
+                          color: categoryColor.withValues(alpha: 0.3),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
@@ -235,7 +235,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -277,7 +277,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: categoryColor.withOpacity(0.1),
+                                color: categoryColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -319,7 +319,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: categoryColor.withOpacity(0.1),
+                      color: categoryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -334,7 +334,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                         Container(
                           width: 1,
                           height: 40,
-                          color: categoryColor.withOpacity(0.3),
+                          color: categoryColor.withValues(alpha: 0.3),
                         ),
                         Expanded(
                           child: _buildStatItem(
@@ -346,7 +346,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
                         Container(
                           width: 1,
                           height: 40,
-                          color: categoryColor.withOpacity(0.3),
+                          color: categoryColor.withValues(alpha: 0.3),
                         ),
                         Expanded(
                           child: _buildStatItem(

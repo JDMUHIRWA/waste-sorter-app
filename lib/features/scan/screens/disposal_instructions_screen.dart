@@ -127,7 +127,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withOpacity(0.1),
+            AppColors.primary.withValues(alpha: 0.1),
             AppColors.background,
           ],
         ),
@@ -168,7 +168,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -199,7 +199,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -263,7 +263,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            categoryColor.withOpacity(0.1),
+            categoryColor.withValues(alpha: 0.1),
             AppColors.background,
           ],
         ),
@@ -323,7 +323,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -367,7 +367,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: categoryColor.withOpacity(0.1),
+                                color: categoryColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -564,7 +564,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -597,7 +597,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
