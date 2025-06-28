@@ -10,6 +10,8 @@ import '../features/home/screens/home_screen.dart';
 import '../features/scan/screens/scan_screen.dart';
 import '../features/scan/screens/disposal_instructions_screen.dart';
 import '../features/scan/screens/confirmation_screen.dart';
+import '../features/leaderboard/screens/leaderboard_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -82,31 +84,3 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
-
-class LeaderboardScreen extends StatelessWidget {
-  const LeaderboardScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Leaderboard')),
-      body: const Center(
-        child: Text('Leaderboard Screen - Coming Soon'),
-      ),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: const Center(
-        child: Text('Settings Screen - Coming Soon'),
-      ),
-    );
-  }
-}
