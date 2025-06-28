@@ -10,7 +10,7 @@ void main() {
 
       // Verify the app builds without errors
       expect(find.byType(WasteSorterApp), findsOneWidget);
-      
+
       // Wait for any pending timers (like splash screen navigation)
       await tester.pumpAndSettle(const Duration(seconds: 5));
     });
@@ -20,18 +20,21 @@ void main() {
         // Set a small screen size
         tester.view.physicalSize = const Size(360, 640);
         tester.view.devicePixelRatio = 1.0;
-        
+
         await tester.pumpWidget(const WasteSorterApp());
         await tester.pumpAndSettle(const Duration(seconds: 5));
-        
+
         // Check for overflow errors but allow for minor rendering issues during tests
         final exception = tester.takeException();
         if (exception != null && exception is FlutterError) {
           // If it's a minor overflow (less than expected), log but don't fail
-          if (exception.toString().contains('overflowed') && 
-              !exception.toString().contains('overflowed by more than 200 pixels')) {
+          if (exception.toString().contains('overflowed') &&
+              !exception
+                  .toString()
+                  .contains('overflowed by more than 200 pixels')) {
             // Minor overflow detected but within acceptable range for testing
-            debugPrint('Minor overflow detected but within acceptable range: $exception');
+            debugPrint(
+                'Minor overflow detected but within acceptable range: $exception');
           } else {
             throw exception;
           }
@@ -42,20 +45,21 @@ void main() {
         // Set a large screen size
         tester.view.physicalSize = const Size(1080, 1920);
         tester.view.devicePixelRatio = 1.0;
-        
+
         await tester.pumpWidget(const WasteSorterApp());
         await tester.pumpAndSettle(const Duration(seconds: 5));
-        
+
         // Verify no overflow errors
         expect(tester.takeException(), isNull);
       });
     });
 
     group('Navigation Tests', () {
-      testWidgets('Navigation between screens works', (WidgetTester tester) async {
+      testWidgets('Navigation between screens works',
+          (WidgetTester tester) async {
         await tester.pumpWidget(const WasteSorterApp());
         await tester.pumpAndSettle(const Duration(seconds: 5));
-        
+
         // Should be on welcome screen after splash
         expect(find.textContaining('Welcome to'), findsOneWidget);
       });
@@ -63,7 +67,7 @@ void main() {
       testWidgets('Back buttons work correctly', (WidgetTester tester) async {
         await tester.pumpWidget(const WasteSorterApp());
         await tester.pumpAndSettle(const Duration(seconds: 5));
-        
+
         // Test back button functionality (will be implemented in navigation flow)
         // This test will be expanded as we implement the full navigation
       });
@@ -75,7 +79,8 @@ void main() {
         // Will be implemented to test specific home screen components
       });
 
-      testWidgets('Scan screen has proper navigation', (WidgetTester tester) async {
+      testWidgets('Scan screen has proper navigation',
+          (WidgetTester tester) async {
         // This will test the scan screen back button and navigation
         // Will be implemented to test scan screen functionality
       });

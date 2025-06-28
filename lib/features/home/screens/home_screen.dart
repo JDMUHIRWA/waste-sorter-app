@@ -112,62 +112,63 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: AppSpacing.md),
               // Tips List - Using Column instead of ListView for better responsiveness
               ..._tipOfTheWeek.map((tip) => Container(
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: Card(
-                  elevation: 0,
-                  color: AppColors.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    side: const BorderSide(color: AppColors.border),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Row(
-                      children: [
-                        // Tip Image Placeholder
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                          ),
-                          child: const Icon(
-                            Icons.recycling,
-                            color: AppColors.primary,
-                            size: 30,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        // Tip Content
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                tip['title'],
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
+                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: Card(
+                      elevation: 0,
+                      color: AppColors.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        side: const BorderSide(color: AppColors.border),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Row(
+                          children: [
+                            // Tip Image Placeholder
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.md),
                               ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                tip['description'],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
-                                ),
+                              child: const Icon(
+                                Icons.recycling,
+                                color: AppColors.primary,
+                                size: 30,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            // Tip Content
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    tip['title'],
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    tip['description'],
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
             ],
           ),
         ),
