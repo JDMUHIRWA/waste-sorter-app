@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,73 +110,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              // Tips List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _tipOfTheWeek.length,
-                  itemBuilder: (context, index) {
-                    final tip = _tipOfTheWeek[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: Card(
-                        elevation: 0,
-                        color: AppColors.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                          side: const BorderSide(color: AppColors.border),
+              // Tips List - Using Column instead of ListView for better responsiveness
+              ..._tipOfTheWeek.map((tip) => Container(
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: Card(
+                  elevation: 0,
+                  color: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: [
+                        // Tip Image Placeholder
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: const Icon(
+                            Icons.recycling,
+                            color: AppColors.primary,
+                            size: 30,
+                          ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: Row(
+                        const SizedBox(width: AppSpacing.md),
+                        // Tip Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Tip Image Placeholder
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
-                                  borderRadius:
-                                      BorderRadius.circular(AppRadius.md),
-                                ),
-                                child: const Icon(
-                                  Icons.recycling,
-                                  color: AppColors.primary,
-                                  size: 30,
+                              Text(
+                                tip['title'],
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
-                              const SizedBox(width: AppSpacing.md),
-                              // Tip Content
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      tip['title'],
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.xs),
-                                    Text(
-                                      tip['description'],
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                tip['description'],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              )),
             ],
           ),
         ),
@@ -200,14 +191,24 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () => context.go('/scan'),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Text(
-            'Scan Item',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.camera_alt,
+                color: Colors.white,
+                size: 20,
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Scan',
+                style: TextStyle(
+                  fontSize: 8,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -221,6 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         elevation: 8,
+        selectedFontSize: 10,
+        unselectedFontSize: 10,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -230,12 +233,12 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.leaderboard_outlined),
             activeIcon: Icon(Icons.leaderboard),
-            label: 'Leaderboard',
+            label: 'Rank',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up_outlined),
             activeIcon: Icon(Icons.trending_up),
-            label: 'Progress',
+            label: 'Stats',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
