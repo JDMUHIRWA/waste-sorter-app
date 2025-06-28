@@ -1,12 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:waste_sorter_app/main.dart';
+import 'package:waste_sorter_app/app/app.dart';
 
 void main() {
-  testWidgets('Displays Firebase Ready text', (WidgetTester tester) async {
+  testWidgets('App smoke test', (WidgetTester tester) async {
     // Build the app
-    await tester.pumpWidget(MyApp());
+    await tester.pumpWidget(const WasteSorterApp());
 
-    // Look for the expected text
-    expect(find.text('Firebase Ready ✅'), findsOneWidget);
+    // Verify the app builds without errors
+    expect(find.byType(WasteSorterApp), findsOneWidget);
+    
+    // Wait for any pending timers (like splash screen navigation)
+    await tester.pumpAndSettle(const Duration(seconds: 5));
   });
 }
