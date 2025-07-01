@@ -114,7 +114,11 @@ class _ScanScreenState extends State<ScanScreen> {
           // Camera Preview
           if (_isCameraInitialized && _cameraController != null)
             Positioned.fill(
-              child: CameraPreview(_cameraController!),
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: CameraPreview(_cameraController!),
+              ),
             )
           else if (_error != null)
             _buildErrorState()
