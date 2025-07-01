@@ -4,7 +4,8 @@ import 'package:waste_sorter_app/features/scan/screens/scan_screen.dart';
 
 void main() {
   group('ScanScreen Widget Tests', () {
-    testWidgets('ScanScreen displays loading state initially', (WidgetTester tester) async {
+    testWidgets('ScanScreen displays loading state initially',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const ScanScreen(),
@@ -16,7 +17,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('ScanScreen has proper navigation structure', (WidgetTester tester) async {
+    testWidgets('ScanScreen has proper navigation structure',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const ScanScreen(),

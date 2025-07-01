@@ -80,12 +80,13 @@ class _ScanScreenState extends State<ScanScreen> {
 
     try {
       final XFile image = await _cameraController!.takePicture();
-      
+
       // Verify the image was captured successfully
       if (await image.length() > 0) {
         // Navigate to disposal instructions with the captured image
         if (mounted) {
-          context.push('/disposal-instructions', extra: {'imagePath': image.path});
+          context
+              .push('/disposal-instructions', extra: {'imagePath': image.path});
         }
       } else {
         setState(() {
@@ -123,7 +124,8 @@ class _ScanScreenState extends State<ScanScreen> {
         // Verify the image exists and has content
         if (await image.length() > 0) {
           if (mounted) {
-            context.push('/disposal-instructions', extra: {'imagePath': image.path});
+            context.push('/disposal-instructions',
+                extra: {'imagePath': image.path});
           }
         } else {
           setState(() {
@@ -166,8 +168,8 @@ class _ScanScreenState extends State<ScanScreen> {
                     fit: BoxFit.fitWidth,
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width / 
-                             (_cameraController!.value.aspectRatio),
+                      height: MediaQuery.of(context).size.width /
+                          (_cameraController!.value.aspectRatio),
                       child: CameraPreview(_cameraController!),
                     ),
                   ),

@@ -138,17 +138,19 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
           ),
         ),
         centerTitle: true,
-        actions: !_isAnalyzing ? [
-          IconButton(
-            onPressed: () {
-              // TODO: Share functionality
-            },
-            icon: const Icon(
-              Icons.share,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ] : null,
+        actions: !_isAnalyzing
+            ? [
+                IconButton(
+                  onPressed: () {
+                    // TODO: Share functionality
+                  },
+                  icon: const Icon(
+                    Icons.share,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: _isAnalyzing ? _buildAnalyzingState() : _buildResultState(),
     );
