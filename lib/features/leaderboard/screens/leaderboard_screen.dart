@@ -69,6 +69,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
           indicatorColor: AppColors.primary,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+          ),
           tabs: const [
             Tab(text: 'Weekly'),
             Tab(text: 'Monthly'),
@@ -90,8 +98,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       children: [
         // Top 3 podium
         Container(
-          height: 200,
-          padding: const EdgeInsets.all(20),
+          height: 180, // Reduced height to prevent overflow
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: _buildPodium(users.take(3).toList()),
         ),
 
@@ -114,17 +122,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     if (topThree.length < 3) return const SizedBox();
 
     return SizedBox(
-      height: 200, // Fixed height to prevent overflow
+      height: 160, // Reduced height to fit better
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // 2nd place
-          _buildPodiumItem(topThree[1], 80, AppColors.success),
+          _buildPodiumItem(topThree[1], 70, AppColors.success),
           // 1st place
-          _buildPodiumItem(topThree[0], 100, AppColors.primary),
+          _buildPodiumItem(topThree[0], 90, AppColors.primary),
           // 3rd place
-          _buildPodiumItem(topThree[2], 60, AppColors.textSecondary),
+          _buildPodiumItem(topThree[2], 50, AppColors.textSecondary),
         ],
       ),
     );
@@ -136,8 +144,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
@@ -146,15 +154,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             child: Center(
               child: Text(
                 user.avatar,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 14),
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             user.name,
             style: const TextStyle(
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -164,13 +172,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           Text(
             '${user.points}',
             style: TextStyle(
-              fontSize: 8,
+              fontSize: 7,
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Container(
-            width: 60,
+            width: 50,
             height: height,
             decoration: BoxDecoration(
               color: color,
@@ -182,7 +190,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ),

@@ -114,10 +114,21 @@ class _ScanScreenState extends State<ScanScreen> {
           // Camera Preview
           if (_isCameraInitialized && _cameraController != null)
             Positioned.fill(
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: CameraPreview(_cameraController!),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: _cameraController!.value.previewSize?.height ?? constraints.maxWidth,
+                        height: _cameraController!.value.previewSize?.width ?? constraints.maxHeight,
+                        child: CameraPreview(_cameraController!),
+                      ),
+                    ),
+                  );
+                },
               ),
             )
           else if (_error != null)
@@ -250,7 +261,8 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
