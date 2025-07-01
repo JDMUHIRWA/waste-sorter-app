@@ -56,10 +56,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         'itemType': 'Plastic Bottle',
         'material': 'PET Plastic',
         'instructions': [
-          'Remove cap and label if possible',
-          'Rinse out any remaining liquid',
-          'Place in recycling bin',
-          'Caps can be recycled separately'
+          'Remove Cap',
+          'Rinse Item', 
+          'Place in Blue Bin'
         ],
         'environmentalImpact': {
           'co2Saved': '0.2 kg',
@@ -371,33 +370,49 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: result['instructions']
-                        .map<Widget>((instruction) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    margin: const EdgeInsets.only(
-                                        top: 6, right: 12),
-                                    decoration: BoxDecoration(
-                                      color: categoryColor,
-                                      shape: BoxShape.circle,
-                                    ),
+                        .asMap()
+                        .entries
+                        .map<Widget>((entry) {
+                          final index = entry.key;
+                          final instruction = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  margin: const EdgeInsets.only(right: 16),
+                                  decoration: BoxDecoration(
+                                    color: categoryColor,
+                                    shape: BoxShape.circle,
                                   ),
-                                  Expanded(
+                                  child: Center(
                                     child: Text(
-                                      instruction,
+                                      '${index + 1}',
                                       style: const TextStyle(
-                                        fontSize: 16,
-                                        height: 1.5,
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ))
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    instruction,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        })
                         .toList(),
                   ),
                 ),
@@ -483,9 +498,10 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          context.push('/confirmation', extra: {
+                          context.push('/congratulations', extra: {
                             'category': result['category'],
-                            'points': 10,
+                            'points': 5,
+                            'streak': 1,
                           });
                         },
                         style: ElevatedButton.styleFrom(
@@ -497,7 +513,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           ),
                         ),
                         child: const Text(
-                          'Mark as Disposed',
+                          'I\'ve Sorted It',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

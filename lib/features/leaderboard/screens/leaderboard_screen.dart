@@ -139,7 +139,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         // Calculate responsive heights based on screen size
         final screenHeight = MediaQuery.of(context).size.height;
         final podiumHeight = screenHeight * 0.25; // 25% of screen height
-        
+
         return Column(
           children: [
             // Top 3 podium with responsive height
@@ -186,7 +186,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         final nameSize = isSmallScreen ? 10.0 : 12.0;
         final pointsSize = isSmallScreen ? 8.0 : 10.0;
         final rankSize = isSmallScreen ? 12.0 : 16.0;
-        
+
         // Calculate podium heights as percentages of available height
         final maxPodiumHeight = constraints.maxHeight * 0.4; // 40% of container
         final firstHeight = maxPodiumHeight;
@@ -200,8 +200,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             // 2nd place
             Expanded(
               child: _buildPodiumItem(
-                topThree[1], 
-                secondHeight, 
+                topThree[1],
+                secondHeight,
                 const Color(0xFF6B9B7A),
                 avatarSize,
                 nameSize,
@@ -213,8 +213,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             // 1st place
             Expanded(
               child: _buildPodiumItem(
-                topThree[0], 
-                firstHeight, 
+                topThree[0],
+                firstHeight,
                 AppColors.primary,
                 avatarSize,
                 nameSize,
@@ -226,8 +226,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             // 3rd place
             Expanded(
               child: _buildPodiumItem(
-                topThree[2], 
-                thirdHeight, 
+                topThree[2],
+                thirdHeight,
                 AppColors.textSecondary,
                 avatarSize,
                 nameSize,
@@ -242,8 +242,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   Widget _buildPodiumItem(
-    LeaderboardUser user, 
-    double height, 
+    LeaderboardUser user,
+    double height,
     Color color,
     double avatarSize,
     double nameSize,
@@ -342,7 +342,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         final nameSize = isSmallScreen ? 14.0 : 16.0;
         final pointsSize = isSmallScreen ? 12.0 : 14.0;
         final spacing = isSmallScreen ? 12.0 : 16.0;
-        
+
         return GestureDetector(
           onTap: () {
             print('Tapped on leaderboard item: ${user.name}');
@@ -453,7 +453,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 if (user.isCurrentUser)
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isSmallScreen ? 6 : 8, 
+                      horizontal: isSmallScreen ? 6 : 8,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(

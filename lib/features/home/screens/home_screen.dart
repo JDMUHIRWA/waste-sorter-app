@@ -51,12 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with user greeting
+              // Header with user greeting - Updated to match Figma
               Row(
                 children: [
                   // User Avatar
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  // Greeting
+                  // Greeting - Updated to match Figma exactly
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           'Good Morning, James',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           'Ready to save our planet?',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -110,81 +110,96 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              // Tips List - Using Column instead of ListView for better responsiveness
-              ..._tipOfTheWeek.map((tip) => Container(
-                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: Card(
-                      elevation: 0,
-                      color: AppColors.surface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        side: const BorderSide(color: AppColors.border),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Row(
-                          children: [
-                            // Tip Image Placeholder
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.md),
+              // Tips List
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _tipOfTheWeek.length,
+                  itemBuilder: (context, index) {
+                    final tip = _tipOfTheWeek[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: Card(
+                        elevation: 0,
+                        color: AppColors.surface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          side: const BorderSide(color: AppColors.border),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: [
+                              // Tip Image Placeholder
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.md),
+                                ),
+                                child: const Icon(
+                                  Icons.recycling,
+                                  color: AppColors.primary,
+                                  size: 30,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.recycling,
-                                color: AppColors.primary,
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            // Tip Content
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    tip['title'],
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                              const SizedBox(width: AppSpacing.md),
+                              // Tip Content
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      tip['title'],
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Text(
-                                    tip['description'],
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      tip['description'],
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  )),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
       ),
-      // Floating Action Button for Scan
+      // Floating Action Button for Scan - Updated to match Figma
       floatingActionButton: Container(
-        width: 64,
-        height: 64,
+        width: 80,
+        height: 80,
         decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(AppRadius.circular),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primary,
+              AppColors.primary.withValues(alpha: 0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(40),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -192,19 +207,19 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () => context.go('/scan'),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.camera_alt,
                 color: Colors.white,
-                size: 20,
+                size: 24,
               ),
-              SizedBox(height: 2),
-              Text(
-                'Scan',
+              const SizedBox(height: 2),
+              const Text(
+                'Scan Item',
                 style: TextStyle(
-                  fontSize: 8,
+                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -223,8 +238,6 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         elevation: 8,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -234,12 +247,12 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.leaderboard_outlined),
             activeIcon: Icon(Icons.leaderboard),
-            label: 'Rank',
+            label: 'Leaderboard',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up_outlined),
             activeIcon: Icon(Icons.trending_up),
-            label: 'Stats',
+            label: 'Progress',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
