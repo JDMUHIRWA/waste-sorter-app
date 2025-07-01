@@ -107,10 +107,11 @@ void main() {
       });
 
       test('should return scan history', () async {
-        final history = await progressService.getScanHistory('test_user_id', limit: 10);
+        final history =
+            await progressService.getScanHistory('test_user_id', limit: 10);
 
         expect(history, hasLength(10));
-        
+
         for (final scan in history) {
           expect(scan.id, isNotEmpty);
           expect(scan.imagePath, contains('/mock/path/'));
@@ -121,13 +122,15 @@ void main() {
 
       test('should update user location', () async {
         // Should not throw any exceptions
-        await progressService.updateUserLocation('test_user_id', 'San Francisco, CA');
+        await progressService.updateUserLocation(
+            'test_user_id', 'San Francisco, CA');
       });
     });
 
     group('MockLeaderboardService', () {
       test('should return weekly leaderboard', () async {
-        final leaderboard = await leaderboardService.getWeeklyLeaderboard(limit: 5);
+        final leaderboard =
+            await leaderboardService.getWeeklyLeaderboard(limit: 5);
 
         expect(leaderboard, hasLength(5));
         expect(leaderboard.first.rank, 1);
@@ -135,33 +138,38 @@ void main() {
         expect(leaderboard.first.points, 2450);
 
         // Should contain current user
-        final currentUser = leaderboard.firstWhere((user) => user.isCurrentUser);
+        final currentUser =
+            leaderboard.firstWhere((user) => user.isCurrentUser);
         expect(currentUser.username, 'You');
         expect(currentUser.rank, 5);
       });
 
       test('should return monthly leaderboard', () async {
-        final leaderboard = await leaderboardService.getMonthlyLeaderboard(limit: 5);
+        final leaderboard =
+            await leaderboardService.getMonthlyLeaderboard(limit: 5);
 
         expect(leaderboard, hasLength(5));
         expect(leaderboard.first.rank, 1);
         expect(leaderboard.first.username, 'Sarah Johnson');
 
         // Should contain current user
-        final currentUser = leaderboard.firstWhere((user) => user.isCurrentUser);
+        final currentUser =
+            leaderboard.firstWhere((user) => user.isCurrentUser);
         expect(currentUser.username, 'You');
         expect(currentUser.rank, 3);
       });
 
       test('should return local leaderboard', () async {
-        final leaderboard = await leaderboardService.getLocalLeaderboard('San Francisco, CA');
+        final leaderboard =
+            await leaderboardService.getLocalLeaderboard('San Francisco, CA');
 
         expect(leaderboard, isNotEmpty);
         // Should return same format as weekly for mock
       });
 
       test('should return user rankings', () async {
-        final rankings = await leaderboardService.getUserRankings('test_user_id');
+        final rankings =
+            await leaderboardService.getUserRankings('test_user_id');
 
         expect(rankings.weeklyRank, 5);
         expect(rankings.monthlyRank, 12);
