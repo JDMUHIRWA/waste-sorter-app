@@ -1,8 +1,8 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/widgets/platform_image.dart';
 
 class DisposalInstructionsScreen extends StatefulWidget {
   final String imagePath;
@@ -40,40 +40,50 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Future<void> _simulateAnalysis() async {
+    if (kDebugMode) {
+      print('Starting analysis simulation...');
+    }
+    
     _progressController.forward();
 
     // Simulate AI processing time
     await Future.delayed(const Duration(seconds: 3));
 
-    // Mock classification result
-    setState(() {
-      _isAnalyzing = false;
-      _classificationResult = {
-        'category': 'Recyclable',
-        'confidence': 0.92,
-        'itemType': 'Plastic Bottle',
-        'material': 'PET Plastic',
-        'instructions': [
-          'Remove cap and label if possible',
-          'Rinse out any remaining liquid',
-          'Place in recycling bin',
-          'Caps can be recycled separately'
-        ],
-        'environmentalImpact': {
-          'co2Saved': '0.2 kg',
-          'energySaved': '1.5 kWh',
-          'description':
-              'Recycling this bottle saves energy equivalent to running a 60W bulb for 25 hours!'
-        },
-        'alternativeUses': [
-          'Plant pot for small herbs',
-          'Storage container for small items',
-          'Bird feeder (with modifications)'
-        ]
-      };
-    });
+    if (kDebugMode) {
+      print('Analysis complete, updating UI...');
+    }
 
-    _slideController.forward();
+    // Mock classification result
+    if (mounted) {
+      setState(() {
+        _isAnalyzing = false;
+        _classificationResult = {
+          'category': 'Recyclable',
+          'confidence': 0.92,
+          'itemType': 'Plastic Bottle',
+          'material': 'PET Plastic',
+          'instructions': [
+            'Remove cap and label if possible',
+            'Rinse out any remaining liquid',
+            'Place in recycling bin',
+            'Caps can be recycled separately'
+          ],
+          'environmentalImpact': {
+            'co2Saved': '0.2 kg',
+            'energySaved': '1.5 kWh',
+            'description':
+                'Recycling this bottle saves energy equivalent to running a 60W bulb for 25 hours!'
+          },
+          'alternativeUses': [
+            'Plant pot for small herbs',
+            'Storage container for small items',
+            'Bird feeder (with modifications)'
+          ]
+        };
+      });
+
+      _slideController.forward();
+    }
   }
 
   Color _getCategoryColor(String category) {
@@ -222,8 +232,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                             ],
                           ),
                         )
-                      : Image.file(
-                          File(widget.imagePath),
+                      : PlatformImage(
+                          imagePath: widget.imagePath,
                           fit: BoxFit.cover,
                         ),
                 ),
