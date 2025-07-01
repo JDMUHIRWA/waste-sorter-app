@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
@@ -198,10 +199,33 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.file(
-                    File(widget.imagePath),
-                    fit: BoxFit.cover,
-                  ),
+                  child: kIsWeb
+                      ? Container(
+                          width: double.infinity,
+                          height: 200,
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image,
+                                size: 48,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Image Preview',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Image.file(
+                          File(widget.imagePath),
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
 

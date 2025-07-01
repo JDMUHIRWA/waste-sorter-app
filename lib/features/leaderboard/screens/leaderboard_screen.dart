@@ -113,76 +113,82 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   Widget _buildPodium(List<LeaderboardUser> topThree) {
     if (topThree.length < 3) return const SizedBox();
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        // 2nd place
-        _buildPodiumItem(topThree[1], 120, AppColors.success),
-        // 1st place
-        _buildPodiumItem(topThree[0], 150, AppColors.primary),
-        // 3rd place
-        _buildPodiumItem(topThree[2], 100, AppColors.textSecondary),
-      ],
+    return SizedBox(
+      height: 200, // Fixed height to prevent overflow
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // 2nd place
+          _buildPodiumItem(topThree[1], 80, AppColors.success),
+          // 1st place
+          _buildPodiumItem(topThree[0], 100, AppColors.primary),
+          // 3rd place
+          _buildPodiumItem(topThree[2], 60, AppColors.textSecondary),
+        ],
+      ),
     );
   }
 
   Widget _buildPodiumItem(LeaderboardUser user, double height, Color color) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-            border: Border.all(color: color, width: 2),
-          ),
-          child: Center(
-            child: Text(
-              user.avatar,
-              style: const TextStyle(fontSize: 24),
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: color, width: 2),
             ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          user.name,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          '${user.points} pts',
-          style: TextStyle(
-            fontSize: 10,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 80,
-          height: height,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-          ),
-          child: Center(
-            child: Text(
-              '#${user.rank}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            child: Center(
+              child: Text(
+                user.avatar,
+                style: const TextStyle(fontSize: 16),
               ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            user.name,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+          Text(
+            '${user.points}',
+            style: TextStyle(
+              fontSize: 8,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: 60,
+            height: height,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+            ),
+            child: Center(
+              child: Text(
+                '#${user.rank}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
