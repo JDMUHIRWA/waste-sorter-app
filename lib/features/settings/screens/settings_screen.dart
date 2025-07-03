@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:waste_sorter_app/services/authentication/auth.dart';
 import '../../../core/constants/app_constants.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,6 +14,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
   bool soundEnabled = true;
   bool darkModeEnabled = false;
+
+  // handle signout
+  Future<void> _signOutUser() async {
+    final authService = AuthService();
+    await authService.signOut();
+
+    if (!mounted) return;
+    context.go('/welcome');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,9 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.description_outlined,
             title: 'Terms of Service',
             subtitle: 'Read our terms and conditions',
-            onTap: () {
-              // TODO: Open terms of service
-            },
+            onTap: () {},
           ),
           _buildDivider(),
           _buildSettingsTile(
@@ -475,10 +484,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Implement sign out logic
-              // Navigate to welcome screen
+            onPressed: () async {
+              Navigator.of(context).pop(); // Close the dialog
+              await _signOutUser(); // Call your sign-out method
             },
             style: TextButton.styleFrom(
               foregroundColor: AppColors.error,

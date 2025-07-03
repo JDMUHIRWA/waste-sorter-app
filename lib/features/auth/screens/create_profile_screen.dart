@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({super.key});
@@ -19,10 +21,30 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     super.dispose();
   }
 
-  void _handleContinue() {
+  void _handleContinue() async {
     if (_formKey.currentState!.validate()) {
       // Handle profile creation logic
-      context.go('/set-location');
+      try {
+        final username = _usernameController.text.trim();
+        if (username.isEmpty) return;
+
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid == null) return;
+
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'name': username,
+        });
+
+        // check if the widget is still mounted before navigating
+        if (!mounted) return;
+        // Then navigate to home or next screen
+        context.go('/set-location');
+      } catch (e) {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
