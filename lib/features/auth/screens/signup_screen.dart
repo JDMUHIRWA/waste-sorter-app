@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../services/authentication/auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -22,10 +23,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _handleSignUp() {
+  void _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
       // Handle sign up logic
-      context.go('/create-profile');
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      try {
+        final authService = AuthService();
+        await authService.signUpWithEmail(email: email, password: password);
+        // check if the widget is still mounted before navigating
+        if (!mounted) return;
+        context.go('/create-profile');
+      } catch (e) {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
