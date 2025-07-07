@@ -1,33 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:waste_sorter_app/services/authentication/auth.dart';
-import '../../../core/constants/app_constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../services/app_services.dart';
+import '../../../models/user_models.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider);
+    final settingsAsync = ref.watch(settingsNotifierProvider);
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool notificationsEnabled = true;
-  bool soundEnabled = true;
-  bool darkModeEnabled = false;
-
-  // handle signout
-  Future<void> _signOutUser() async {
-    final authService = AuthService();
-    await authService.signOut();
-
-    if (!mounted) return;
-    context.go('/welcome');
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Settings',
@@ -36,40 +22,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Profile Section
-            _buildProfileSection(),
-            const SizedBox(height: 32),
-
-            // App Preferences
-            _buildPreferencesSection(),
-            const SizedBox(height: 32),
-
-            // Support Section
-            _buildSupportSection(),
-            const SizedBox(height: 32),
-
-            // Account Management
-            _buildAccountSection(),
-            const SizedBox(height: 32),
-          ],
+      body: settingsAsync.when(
+        data: (settings) => SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              currentUser != null
+                  ? _buildProfileSection(context, ref, currentUser)
+                  : _buildSignInPrompt(context),
+              const SizedBox(height: 24),
+              _buildPreferencesSection(context, ref, settings),
+              const SizedBox(height: 24),
+              _buildSupportSection(context),
+              const SizedBox(height: 24),
+              if (currentUser != null) _buildAccountSection(context, ref),
+            ],
+          ),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Text('Error loading settings: $error'),
         ),
       ),
     );
   }
 
-  Widget _buildProfileSection() {
+  Widget _buildProfileSection(
+      BuildContext context, WidgetRef ref, UserProfile user) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -81,81 +77,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: Column(
         children: [
-          // Profile Header
-          Row(
-            children: [
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Text(
-                    '👤',
-                    style: TextStyle(fontSize: 30),
-                  ),
-                ),
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            child: Text(
+              user.username.isNotEmpty ? user.username[0].toUpperCase() : 'U',
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'John Doe',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'john.doe@example.com',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '1,820 Points',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.success,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            user.username,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.headlineSmall?.color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            user.email,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '${user.totalPoints} points',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
               ),
-              IconButton(
-                onPressed: () {
-                  // TODO: Implement edit profile
-                },
-                icon: const Icon(Icons.edit, color: AppColors.primary),
+            ),
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () => _showEditProfileDialog(context, ref, user),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.primary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
+            ),
+            child: const Text(
+              'Edit Profile',
+              style: TextStyle(color: AppColors.primary),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPreferencesSection() {
+  Widget _buildPreferencesSection(
+      BuildContext context, WidgetRef ref, AppSettings settings) {
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -168,66 +159,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              'App Preferences',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+          const Text(
+            'Preferences',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          _buildSwitchTile(
-            icon: Icons.notifications,
-            title: 'Push Notifications',
-            subtitle: 'Receive alerts about new features and updates',
-            value: notificationsEnabled,
+          const SizedBox(height: 16),
+          SwitchListTile(
+            title: const Text('Push Notifications'),
+            subtitle: const Text('Get notified about your progress'),
+            value: settings.notificationsEnabled,
             onChanged: (value) {
-              setState(() {
-                notificationsEnabled = value;
-              });
+              ref
+                  .read(settingsNotifierProvider.notifier)
+                  .updateNotifications(value);
             },
+            activeColor: AppColors.primary,
           ),
-          _buildDivider(),
-          _buildSwitchTile(
-            icon: Icons.volume_up,
-            title: 'Sound Effects',
-            subtitle: 'Play sounds for actions and confirmations',
-            value: soundEnabled,
+          SwitchListTile(
+            title: const Text('Sound Effects'),
+            subtitle: const Text('Play sounds for interactions'),
+            value: settings.soundEnabled,
             onChanged: (value) {
-              setState(() {
-                soundEnabled = value;
-              });
+              ref.read(settingsNotifierProvider.notifier).updateSound(value);
             },
+            activeColor: AppColors.primary,
           ),
-          _buildDivider(),
-          _buildSwitchTile(
-            icon: Icons.dark_mode,
-            title: 'Dark Mode',
-            subtitle: 'Switch to dark theme (Coming Soon)',
-            value: darkModeEnabled,
-            onChanged: null, // Disabled for now
-          ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.language,
-            title: 'Language',
-            subtitle: 'English (US)',
-            onTap: () {
-              // TODO: Implement language selection
+          SwitchListTile(
+            title: const Text('Dark Mode'),
+            subtitle: const Text('Use dark theme'),
+            value: settings.darkMode,
+            onChanged: (value) {
+              ref.read(settingsNotifierProvider.notifier).updateDarkMode(value);
             },
+            activeColor: AppColors.primary,
+          ),
+          ListTile(
+            title: const Text('Language'),
+            subtitle: Text(settings.language),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _showLanguageDialog(context, ref),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSupportSection() {
+  Widget _buildSupportSection(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -240,61 +224,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              'Support & Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+          const Text(
+            'Support',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          _buildSettingsTile(
-            icon: Icons.help_outline,
-            title: 'Help & FAQ',
-            subtitle: 'Get answers to common questions',
-            onTap: () {
-              // TODO: Navigate to help screen
-            },
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.help_outline, color: AppColors.primary),
+            title: const Text('Help & FAQ'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _showHelpDialog(context),
           ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.feedback_outlined,
-            title: 'Send Feedback',
-            subtitle: 'Help us improve the app',
-            onTap: () {
-              // TODO: Open feedback form
-            },
+          ListTile(
+            leading: const Icon(Icons.info_outline, color: AppColors.primary),
+            title: const Text('About'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _showAboutDialog(context),
           ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.star_outline,
-            title: 'Rate the App',
-            subtitle: 'Show your support in the app store',
-            onTap: () {
-              // TODO: Open app store rating
-            },
-          ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.info_outline,
-            title: 'About',
-            subtitle: 'Version 1.0.0',
-            onTap: () {
-              _showAboutDialog();
-            },
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined,
+                color: AppColors.primary),
+            title: const Text('Privacy Policy'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _showPrivacyDialog(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAccountSection() {
+  Widget _buildAccountSection(BuildContext context, WidgetRef ref) {
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -307,160 +273,183 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              'Account',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+          const Text(
+            'Account',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          _buildSettingsTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy Policy',
-            subtitle: 'Read our privacy policy',
-            onTap: () {
-              // TODO: Open privacy policy
-            },
-          ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.description_outlined,
-            title: 'Terms of Service',
-            subtitle: 'Read our terms and conditions',
-            onTap: () {},
-          ),
-          _buildDivider(),
-          _buildSettingsTile(
-            icon: Icons.logout,
-            title: 'Sign Out',
-            subtitle: 'Sign out of your account',
-            textColor: AppColors.error,
-            onTap: () {
-              _showSignOutDialog();
-            },
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              'Sign Out',
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () => _showSignOutDialog(context, ref),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSwitchTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool>? onChanged,
-  }) {
-    return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          color: AppColors.primary,
-          size: 20,
-        ),
+  Widget _buildSignInPrompt(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 14,
-          color: AppColors.textSecondary,
-        ),
-      ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeColor: AppColors.primary,
+      child: Column(
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: 64,
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Sign in to access your profile',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Create an account to save your progress and settings',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to sign in screen
+              // context.go('/welcome');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Sign In',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSettingsTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    Color? textColor,
-  }) {
-    return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: (textColor ?? AppColors.primary).withValues(alpha: 0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          color: textColor ?? AppColors.primary,
-          size: 20,
-        ),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: textColor ?? AppColors.textPrimary,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 14,
-          color: AppColors.textSecondary,
-        ),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: AppColors.textSecondary,
-      ),
-      onTap: onTap,
-    );
-  }
+  void _showEditProfileDialog(
+      BuildContext context, WidgetRef ref, UserProfile user) {
+    final nameController = TextEditingController(text: user.username);
+    final emailController = TextEditingController(text: user.email);
 
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: AppColors.border,
-      indent: 72,
-    );
-  }
-
-  void _showAboutDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('About WasteSorter'),
-        content: const Column(
+        title: const Text('Edit Profile'),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text(
-                'WasteSorter helps you classify and dispose of waste properly, contributing to a cleaner environment.'),
-            SizedBox(height: 16),
-            Text('Made with ❤️ for the planet'),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
           ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Update user profile
+              final updatedUser = user.copyWith(
+                username: nameController.text,
+                email: emailController.text,
+              );
+              ref.read(userServiceProvider).updateProfile(updatedUser);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Language'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('English'),
+              onTap: () {
+                ref
+                    .read(settingsNotifierProvider.notifier)
+                    .updateLanguage('English');
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              title: const Text('Spanish'),
+              onTap: () {
+                ref
+                    .read(settingsNotifierProvider.notifier)
+                    .updateLanguage('Spanish');
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Help & FAQ'),
+        content: const Text(
+          'How to use WasteSorter:\n\n'
+          '1. Point your camera at any waste item\n'
+          '2. Take a photo to scan the item\n'
+          '3. Follow the disposal instructions\n'
+          '4. Earn points for proper sorting!\n\n'
+          'For more help, contact support@wastsorter.com',
         ),
         actions: [
           TextButton(
@@ -472,7 +461,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showSignOutDialog() {
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About WasteSorter'),
+        content: const Text(
+          'WasteSorter v1.0.0\n\n'
+          'An AI-powered waste sorting assistant that helps you properly dispose of waste items while tracking your environmental impact.\n\n'
+          'Built with Flutter and powered by advanced machine learning models.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrivacyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Privacy Policy'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'Privacy Policy\n\n'
+            'We value your privacy and are committed to protecting your personal information.\n\n'
+            'Data Collection:\n'
+            '• Photos are processed locally on your device\n'
+            '• We collect usage statistics to improve our service\n'
+            '• Personal information is encrypted and secure\n\n'
+            'Data Usage:\n'
+            '• Photos are not stored or shared\n'
+            '• Anonymous usage data helps improve AI accuracy\n'
+            '• Your progress data is tied to your account\n\n'
+            'For full privacy policy, visit wastsorter.com/privacy',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSignOutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -483,15 +522,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop(); // Close the dialog
-              await _signOutUser(); // Call your sign-out method
+          ElevatedButton(
+            onPressed: () {
+              // Sign out user
+              ref.read(currentUserProvider.notifier).signOut();
+              Navigator.of(context).pop();
             },
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
-            ),
-            child: const Text('Sign Out'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child:
+                const Text('Sign Out', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

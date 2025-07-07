@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -52,27 +53,67 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Leaderboard',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+        title: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            return Text(
+              'Leaderboard',
+              style: TextStyle(
+                fontSize: screenWidth < 400 ? 20 : 24,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
-        backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          tabs: const [
-            Tab(text: 'Weekly'),
-            Tab(text: 'Monthly'),
-          ],
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          onPressed: () {
+            context.go('/home');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: constraints.maxWidth * 0.05,
+                ),
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardTheme.color,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: AppColors.textSecondary,
+                  indicator: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: constraints.maxWidth < 400 ? 14 : 16,
+                  ),
+                  unselectedLabelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: constraints.maxWidth < 400 ? 14 : 16,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Weekly'),
+                    Tab(text: 'Monthly'),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
       body: TabBarView(
@@ -86,216 +127,344 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   Widget _buildLeaderboardList(List<LeaderboardUser> users) {
-    return Column(
-      children: [
-        // Top 3 podium
-        Container(
-          height: 200,
-          padding: const EdgeInsets.all(20),
-          child: _buildPodium(users.take(3).toList()),
-        ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive heights based on screen size
+        final screenHeight = MediaQuery.of(context).size.height;
+        final podiumHeight = screenHeight * 0.25; // 25% of screen height
 
-        // Rest of the rankings
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: users.length - 3,
-            itemBuilder: (context, index) {
-              final user = users[index + 3];
-              return _buildLeaderboardItem(user);
-            },
-          ),
-        ),
-      ],
+        return Column(
+          children: [
+            // Top 3 podium with responsive height
+            Container(
+              height: podiumHeight.clamp(180.0, 250.0), // Min 180, Max 250
+              padding: EdgeInsets.symmetric(
+                horizontal: constraints.maxWidth * 0.05, // 5% of screen width
+                vertical: 16,
+              ),
+              child: _buildPodium(users.take(3).toList()),
+            ),
+
+            // Rest of the rankings
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.all(constraints.maxWidth * 0.05),
+                  itemCount: users.length - 3,
+                  itemBuilder: (context, index) {
+                    final user = users[index + 3];
+                    return _buildLeaderboardItem(user);
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildPodium(List<LeaderboardUser> topThree) {
     if (topThree.length < 3) return const SizedBox();
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        // 2nd place
-        _buildPodiumItem(topThree[1], 120, AppColors.success),
-        // 1st place
-        _buildPodiumItem(topThree[0], 150, AppColors.primary),
-        // 3rd place
-        _buildPodiumItem(topThree[2], 100, AppColors.textSecondary),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive sizes
+        final isSmallScreen = constraints.maxWidth < 400;
+        final avatarSize = isSmallScreen ? 40.0 : 50.0;
+        final nameSize = isSmallScreen ? 10.0 : 12.0;
+        final pointsSize = isSmallScreen ? 8.0 : 10.0;
+        final rankSize = isSmallScreen ? 12.0 : 16.0;
+
+        // Calculate podium heights as percentages of available height
+        final maxPodiumHeight = constraints.maxHeight * 0.4; // 40% of container
+        final firstHeight = maxPodiumHeight;
+        final secondHeight = maxPodiumHeight * 0.8;
+        final thirdHeight = maxPodiumHeight * 0.6;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // 2nd place
+            Expanded(
+              child: _buildPodiumItem(
+                topThree[1],
+                secondHeight,
+                const Color(0xFF6B9B7A),
+                avatarSize,
+                nameSize,
+                pointsSize,
+                rankSize,
+              ),
+            ),
+            const SizedBox(width: 8),
+            // 1st place
+            Expanded(
+              child: _buildPodiumItem(
+                topThree[0],
+                firstHeight,
+                AppColors.primary,
+                avatarSize,
+                nameSize,
+                pointsSize,
+                rankSize,
+              ),
+            ),
+            const SizedBox(width: 8),
+            // 3rd place
+            Expanded(
+              child: _buildPodiumItem(
+                topThree[2],
+                thirdHeight,
+                AppColors.textSecondary,
+                avatarSize,
+                nameSize,
+                pointsSize,
+                rankSize,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildPodiumItem(LeaderboardUser user, double height, Color color) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-            border: Border.all(color: color, width: 2),
+  Widget _buildPodiumItem(
+    LeaderboardUser user,
+    double height,
+    Color color,
+    double avatarSize,
+    double nameSize,
+    double pointsSize,
+    double rankSize,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tapped on ${user.name} - ${user.points} points'),
+            duration: const Duration(seconds: 1),
+            backgroundColor: AppColors.primary,
           ),
-          child: Center(
-            child: Text(
-              user.avatar,
-              style: const TextStyle(fontSize: 24),
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Avatar
+          Container(
+            width: avatarSize,
+            height: avatarSize,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+              border: Border.all(color: color, width: 2),
             ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          user.name,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          '${user.points} pts',
-          style: TextStyle(
-            fontSize: 10,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 80,
-          height: height,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-          ),
-          child: Center(
-            child: Text(
-              '#${user.rank}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            child: Center(
+              child: Text(
+                user.avatar,
+                style: TextStyle(fontSize: avatarSize * 0.4),
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
+          SizedBox(height: avatarSize * 0.16),
 
-  Widget _buildLeaderboardItem(LeaderboardUser user) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: user.isCurrentUser
-            ? AppColors.primary.withValues(alpha: 0.1)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: user.isCurrentUser
-            ? Border.all(color: AppColors.primary, width: 2)
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+          // Name - with overflow protection
+          Flexible(
+            child: Text(
+              user.name,
+              style: TextStyle(
+                fontSize: nameSize,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Rank
+          SizedBox(height: avatarSize * 0.08),
+
+          // Points
+          Text(
+            '${user.points}',
+            style: TextStyle(
+              fontSize: pointsSize,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: avatarSize * 0.16),
+
+          // Podium
           Container(
-            width: 40,
-            height: 40,
+            height: height,
             decoration: BoxDecoration(
-              color: user.isCurrentUser
-                  ? AppColors.primary
-                  : AppColors.textSecondary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: color,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(8)),
             ),
             child: Center(
               child: Text(
                 '#${user.rank}',
                 style: TextStyle(
-                  color: user.isCurrentUser
-                      ? Colors.white
-                      : AppColors.textSecondary,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: rankSize,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+        ],
+      ),
+    );
+  }
 
-          // Avatar
-          Container(
-            width: 50,
-            height: 50,
+  Widget _buildLeaderboardItem(LeaderboardUser user) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 400;
+        final rankSize = isSmallScreen ? 35.0 : 40.0;
+        final avatarSize = isSmallScreen ? 45.0 : 50.0;
+        final nameSize = isSmallScreen ? 14.0 : 16.0;
+        final pointsSize = isSmallScreen ? 12.0 : 14.0;
+        final spacing = isSmallScreen ? 12.0 : 16.0;
+
+        return GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    '${user.name} is ranked #${user.rank} with ${user.points} points'),
+                duration: const Duration(seconds: 1),
+                backgroundColor: user.isCurrentUser
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.all(spacing),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                user.avatar,
-                style: const TextStyle(fontSize: 20),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-
-          // Name and points
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: user.isCurrentUser
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${user.points} points',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
+              color: user.isCurrentUser
+                  ? AppColors.primary.withValues(alpha: 0.1)
+                  : Theme.of(context).cardTheme.color,
+              borderRadius: BorderRadius.circular(12),
+              border: user.isCurrentUser
+                  ? Border.all(color: AppColors.primary, width: 2)
+                  : null,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-          ),
-
-          // Badge for current user
-          if (user.isCurrentUser)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'You',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+            child: Row(
+              children: [
+                // Rank
+                Container(
+                  width: rankSize,
+                  height: rankSize,
+                  decoration: BoxDecoration(
+                    color: user.isCurrentUser
+                        ? AppColors.primary
+                        : AppColors.textSecondary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '#${user.rank}',
+                      style: TextStyle(
+                        color: user.isCurrentUser
+                            ? Colors.white
+                            : AppColors.textSecondary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: isSmallScreen ? 12 : 14,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: spacing),
+
+                // Avatar
+                Container(
+                  width: avatarSize,
+                  height: avatarSize,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      user.avatar,
+                      style: TextStyle(fontSize: avatarSize * 0.4),
+                    ),
+                  ),
+                ),
+                SizedBox(width: spacing),
+
+                // Name and points
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name,
+                        style: TextStyle(
+                          fontSize: nameSize,
+                          fontWeight: FontWeight.bold,
+                          color: user.isCurrentUser
+                              ? AppColors.primary
+                              : Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${user.points} points',
+                        style: TextStyle(
+                          fontSize: pointsSize,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Badge for current user
+                if (user.isCurrentUser)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isSmallScreen ? 6 : 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'You',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: isSmallScreen ? 10 : 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -10,6 +10,7 @@ import '../features/home/screens/home_screen.dart';
 import '../features/scan/screens/scan_screen.dart';
 import '../features/scan/screens/disposal_instructions_screen.dart';
 import '../features/scan/screens/confirmation_screen.dart';
+import '../features/scan/screens/congratulations_screen.dart';
 import '../features/leaderboard/screens/leaderboard_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 
@@ -71,6 +72,20 @@ final GoRouter appRouter = GoRouter(
         return ConfirmationScreen(
           category: category,
           points: points,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/congratulations',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final points = extra?['points'] as int? ?? 5;
+        final streak = extra?['streak'] as int? ?? 1;
+        final category = extra?['category'] as String? ?? 'Recyclable';
+        return CongratulationsScreen(
+          points: points,
+          streak: streak,
+          category: category,
         );
       },
     ),

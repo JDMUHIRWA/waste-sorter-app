@@ -113,6 +113,36 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
     final categoryColor = _getCategoryColor(widget.category);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => context.go('/home'),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        title: const Text(
+          'Success!',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => context.go('/home'),
+            icon: const Icon(
+              Icons.home,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -130,21 +160,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen>
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                // Header with close button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.close),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-
                 const Spacer(),
 
                 // Success Animation

@@ -51,12 +51,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -64,7 +62,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -79,12 +76,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
               children: [
                 const SizedBox(height: AppSpacing.xl),
                 // Username Field
-                const Text(
+                Text(
                   'Username',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -92,29 +89,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   controller: _usernameController,
                   decoration: const InputDecoration(
                     hintText: 'Username',
-                    hintStyle: TextStyle(
-                      color: AppColors.textHint,
-                      fontSize: 16,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.primary, width: 2),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

@@ -47,12 +47,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -60,7 +58,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -75,12 +72,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 const SizedBox(height: AppSpacing.xl),
                 // Email Address Field
-                const Text(
+                Text(
                   'Email address',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -89,29 +86,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     hintText: 'Your email address',
-                    hintStyle: TextStyle(
-                      color: AppColors.textHint,
-                      fontSize: 16,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.primary, width: 2),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -125,12 +99,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 // Password Field
-                const Text(
+                Text(
                   'Password',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -139,29 +113,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
                     hintText: 'Enter Password',
-                    hintStyle: const TextStyle(
-                      color: AppColors.textHint,
-                      fontSize: 16,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.border),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.primary, width: 2),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordVisible

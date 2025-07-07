@@ -69,14 +69,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with user greeting
+              // Header with user greeting - Updated to match Figma
               Row(
                 children: [
                   // User Avatar
@@ -94,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  // Greeting
+                  // Greeting - Updated to match Figma exactly
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,16 +101,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           'Good Morning, $_userName',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
                         Text(
                           'Ready to save our planet?',
                           style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                       ],
@@ -121,12 +122,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
               // Tips of the Week Section
-              const Text(
+              Text(
                 'Tip of the Week',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -140,10 +141,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: Card(
                         elevation: 0,
-                        color: AppColors.surface,
+                        color: Theme.of(context).cardTheme.color,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppRadius.lg),
-                          side: const BorderSide(color: AppColors.border),
+                          side: BorderSide(
+                            color: Theme.of(context).dividerColor,
+                          ),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(AppSpacing.md),
@@ -173,18 +176,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Text(
                                       tip['title'],
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color,
                                       ),
                                     ),
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       tip['description'],
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        color: AppColors.textSecondary,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color,
                                       ),
                                     ),
                                   ],
@@ -202,18 +211,25 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      // Floating Action Button for Scan
+      // Floating Action Button for Scan - Updated to match Figma
       floatingActionButton: Container(
-        width: 64,
-        height: 64,
+        width: 80,
+        height: 80,
         decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(AppRadius.circular),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primary,
+              AppColors.primary.withValues(alpha: 0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(40),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -221,14 +237,24 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () => context.go('/scan'),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Text(
-            'Scan Item',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.camera_alt,
+                color: Colors.white,
+                size: 24,
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Scan Item',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -238,9 +264,6 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: _onBottomNavTap,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.background,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondary,
         elevation: 8,
         items: const [
           BottomNavigationBarItem(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -27,6 +28,18 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _initializeCamera() async {
     try {
+      // Check and request camera permission
+      final cameraPermission = await Permission.camera.status;
+      if (cameraPermission != PermissionStatus.granted) {
+        final result = await Permission.camera.request();
+        if (result != PermissionStatus.granted) {
+          setState(() {
+            _error = 'Camera permission is required to scan waste items';
+          });
+          return;
+        }
+      }
+
       _cameras = await availableCameras();
       if (_cameras!.isNotEmpty) {
         _cameraController = CameraController(
@@ -35,8 +48,14 @@ class _ScanScreenState extends State<ScanScreen> {
           enableAudio: false,
         );
         await _cameraController!.initialize();
+        if (mounted) {
+          setState(() {
+            _isCameraInitialized = true;
+          });
+        }
+      } else {
         setState(() {
-          _isCameraInitialized = true;
+          _error = 'No cameras found on this device';
         });
       }
     } catch (e) {
@@ -48,54 +67,82 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _captureImage() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      setState(() {
+        _error = 'Camera is not ready. Please wait for initialization.';
+      });
       return;
     }
 
     setState(() {
       _isLoading = true;
+      _error = null;
     });
 
     try {
       final XFile image = await _cameraController!.takePicture();
-      // Navigate to disposal instructions with the captured image
-      if (mounted) {
-        context
-            .push('/disposal-instructions', extra: {'imagePath': image.path});
+
+      // Verify the image was captured successfully
+      if (await image.length() > 0) {
+        // Navigate to disposal instructions with the captured image
+        if (mounted) {
+          context
+              .push('/disposal-instructions', extra: {'imagePath': image.path});
+        }
+      } else {
+        setState(() {
+          _error = 'Failed to capture image. Please try again.';
+        });
       }
     } catch (e) {
       setState(() {
         _error = 'Failed to capture image: ${e.toString()}';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _pickImageFromGallery() async {
     setState(() {
       _isLoading = true;
+      _error = null;
     });
 
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
+        maxWidth: 1920,
+        maxHeight: 1080,
       );
 
-      if (image != null && mounted) {
-        context
-            .push('/disposal-instructions', extra: {'imagePath': image.path});
+      if (image != null) {
+        // Verify the image exists and has content
+        if (await image.length() > 0) {
+          if (mounted) {
+            context.push('/disposal-instructions',
+                extra: {'imagePath': image.path});
+          }
+        } else {
+          setState(() {
+            _error = 'Selected image is empty. Please choose another image.';
+          });
+        }
       }
     } catch (e) {
       setState(() {
         _error = 'Failed to pick image: ${e.toString()}';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -114,7 +161,20 @@ class _ScanScreenState extends State<ScanScreen> {
           // Camera Preview
           if (_isCameraInitialized && _cameraController != null)
             Positioned.fill(
-              child: CameraPreview(_cameraController!),
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.center,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width /
+                          (_cameraController!.value.aspectRatio),
+                      child: CameraPreview(_cameraController!),
+                    ),
+                  ),
+                ),
+              ),
             )
           else if (_error != null)
             _buildErrorState()
@@ -246,7 +306,8 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
