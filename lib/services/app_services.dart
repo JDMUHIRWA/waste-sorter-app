@@ -2,8 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_models.dart';
 import '../services/classification_service.dart';
 import '../services/user_service.dart';
+import '../services/settings_service.dart';
 
 // Service Providers - These will be swapped from mock to real implementations
+
+/// Settings service provider - handles async initialization
+final settingsServiceProvider = FutureProvider<SettingsService>((ref) async {
+  final service = SettingsService();
+  await service.init();
+  return service;
+});
 
 /// Classification service provider
 final classificationServiceProvider = Provider<ClassificationService>((ref) {
@@ -72,7 +80,99 @@ final monthlyLeaderboardProvider =
   return await leaderboardService.getMonthlyLeaderboard();
 });
 
+/// Settings state providers
+final notificationsEnabledProvider = FutureProvider<bool>((ref) async {
+  final settingsService = await ref.watch(settingsServiceProvider.future);
+  return settingsService.notificationsEnabled;
+});
+
+final soundEnabledProvider = FutureProvider<bool>((ref) async {
+  final settingsService = await ref.watch(settingsServiceProvider.future);
+  return settingsService.soundEnabled;
+});
+
+final darkModeEnabledProvider = FutureProvider<bool>((ref) async {
+  final settingsService = await ref.watch(settingsServiceProvider.future);
+  return settingsService.darkModeEnabled;
+});
+
+final languageProvider = FutureProvider<String>((ref) async {
+  final settingsService = await ref.watch(settingsServiceProvider.future);
+  return settingsService.language;
+});
+
+/// Consolidated settings provider that returns AppSettings
+final settingsProvider = FutureProvider<AppSettings>((ref) async {
+  final settingsService = await ref.watch(settingsServiceProvider.future);
+  return AppSettings(
+    notificationsEnabled: settingsService.notificationsEnabled,
+    soundEnabled: settingsService.soundEnabled,
+    darkMode: settingsService.darkModeEnabled,
+    language: settingsService.language,
+  );
+});
+
+/// Settings state notifier for managing all app settings
+final settingsNotifierProvider =
+    AsyncNotifierProvider<AppSettingsNotifier, AppSettings>(() {
+  return AppSettingsNotifier();
+});
+
+/// Auth service provider (for sign out functionality)
+final authServiceProvider = Provider<UserService>((ref) {
+  return ref.read(userServiceProvider);
+});
+
 // State Notifiers
+
+/// App settings notifier for managing consolidated settings
+class AppSettingsNotifier extends AsyncNotifier<AppSettings> {
+  SettingsService? _settingsService;
+
+  @override
+  Future<AppSettings> build() async {
+    _settingsService = await ref.watch(settingsServiceProvider.future);
+    return AppSettings(
+      notificationsEnabled: _settingsService!.notificationsEnabled,
+      soundEnabled: _settingsService!.soundEnabled,
+      darkMode: _settingsService!.darkModeEnabled,
+      language: _settingsService!.language,
+    );
+  }
+
+  Future<void> updateNotifications(bool enabled) async {
+    if (_settingsService == null) return;
+
+    await _settingsService!.setNotificationsEnabled(enabled);
+    final currentState = state.value!;
+    state =
+        AsyncValue.data(currentState.copyWith(notificationsEnabled: enabled));
+  }
+
+  Future<void> updateSound(bool enabled) async {
+    if (_settingsService == null) return;
+
+    await _settingsService!.setSoundEnabled(enabled);
+    final currentState = state.value!;
+    state = AsyncValue.data(currentState.copyWith(soundEnabled: enabled));
+  }
+
+  Future<void> updateDarkMode(bool enabled) async {
+    if (_settingsService == null) return;
+
+    await _settingsService!.setDarkModeEnabled(enabled);
+    final currentState = state.value!;
+    state = AsyncValue.data(currentState.copyWith(darkMode: enabled));
+  }
+
+  Future<void> updateLanguage(String language) async {
+    if (_settingsService == null) return;
+
+    await _settingsService!.setLanguage(language);
+    final currentState = state.value!;
+    state = AsyncValue.data(currentState.copyWith(language: language));
+  }
+}
 
 class CurrentUserNotifier extends StateNotifier<UserProfile?> {
   CurrentUserNotifier(this._userService) : super(null) {
@@ -216,20 +316,7 @@ class MockProgressService implements ProgressService {
   Future<UserStats> getUserStats(String userId) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    return const UserStats(
-      totalPoints: 125,
-      currentStreak: 7,
-      longestStreak: 12,
-      totalScans: 45,
-      weeklyPoints: 35,
-      monthlyPoints: 125,
-      categoryCounts: {
-        'Recyclable': 25,
-        'Compostable': 15,
-        'Landfill': 3,
-        'Hazardous': 2,
-      },
-    );
+    return UserStats.mock();
   }
 
   @override

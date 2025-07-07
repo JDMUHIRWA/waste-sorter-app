@@ -65,38 +65,7 @@ abstract class LeaderboardService {
   Future<UserRankings> getUserRankings(String userId);
 }
 
-/// User statistics model
-class UserStats {
-  const UserStats({
-    required this.totalPoints,
-    required this.currentStreak,
-    required this.longestStreak,
-    required this.totalScans,
-    required this.weeklyPoints,
-    required this.monthlyPoints,
-    required this.categoryCounts,
-  });
-
-  final int totalPoints;
-  final int currentStreak;
-  final int longestStreak;
-  final int totalScans;
-  final int weeklyPoints;
-  final int monthlyPoints;
-  final Map<String, int> categoryCounts;
-
-  factory UserStats.fromJson(Map<String, dynamic> json) {
-    return UserStats(
-      totalPoints: json['totalPoints'] as int,
-      currentStreak: json['currentStreak'] as int,
-      longestStreak: json['longestStreak'] as int,
-      totalScans: json['totalScans'] as int,
-      weeklyPoints: json['weeklyPoints'] as int,
-      monthlyPoints: json['monthlyPoints'] as int,
-      categoryCounts: Map<String, int>.from(json['categoryCounts'] as Map),
-    );
-  }
-}
+// UserStats moved to user_models.dart for consistency
 
 /// User rankings across different leaderboards
 class UserRankings {

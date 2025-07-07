@@ -53,7 +53,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: LayoutBuilder(
           builder: (context, constraints) {
@@ -63,12 +62,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               style: TextStyle(
                 fontSize: screenWidth < 400 ? 20 : 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
               ),
             );
           },
         ),
-        backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: true,
@@ -77,10 +74,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             print('DEBUG: Back button pressed');
             context.go('/home');
           },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.textPrimary,
-          ),
+          icon: const Icon(Icons.arrow_back),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56),
@@ -92,7 +86,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 ),
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: TabBar(
@@ -363,7 +357,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             decoration: BoxDecoration(
               color: user.isCurrentUser
                   ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.white,
+                  : Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(12),
               border: user.isCurrentUser
                   ? Border.all(color: AppColors.primary, width: 2)
@@ -432,7 +426,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                           fontWeight: FontWeight.bold,
                           color: user.isCurrentUser
                               ? AppColors.primary
-                              : AppColors.textPrimary,
+                              : Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -442,7 +436,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                         '${user.points} points',
                         style: TextStyle(
                           fontSize: pointsSize,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
                       ),
                     ],

@@ -35,12 +35,10 @@ class _SetLocationScreenState extends State<SetLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -48,7 +46,6 @@ class _SetLocationScreenState extends State<SetLocationScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -64,32 +61,7 @@ class _SetLocationScreenState extends State<SetLocationScreen> {
                 controller: _searchController,
                 decoration: const InputDecoration(
                   hintText: 'Search Location',
-                  hintStyle: TextStyle(
-                    color: AppColors.textHint,
-                    fontSize: 16,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.border),
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.border),
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primary, width: 2),
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: AppColors.textSecondary,
-                  ),
+                  prefixIcon: Icon(Icons.search),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -98,9 +70,9 @@ class _SetLocationScreenState extends State<SetLocationScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: InkWell(
                   onTap: _useCurrentLocation,

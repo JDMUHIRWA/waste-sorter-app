@@ -97,62 +97,43 @@ void main() {
       // Sign in user
       await userNotifier.signIn('test@example.com', 'password123');
 
-      // Get stats - need to handle the AsyncValue properly
-      final statsAsync = container.read(userStatsProvider);
+      // Wait for the future to complete
+      final stats = await container.read(userStatsProvider.future);
 
-      await statsAsync.when(
-        data: (stats) {
-          expect(stats, isNotNull);
-          expect(stats!.totalPoints, 125);
-          expect(stats.currentStreak, 7);
-        },
-        loading: () => fail('Should not be loading'),
-        error: (error, stack) => fail('Should not have error: $error'),
-      );
+      expect(stats, isNotNull);
+      expect(stats!.totalPoints, 1820);
+      expect(stats.currentStreak, 7);
     });
 
     test('user stats provider returns null when no user signed in', () async {
-      final statsAsync = container.read(userStatsProvider);
+      // Wait for the future to complete
+      final stats = await container.read(userStatsProvider.future);
 
-      await statsAsync.when(
-        data: (stats) {
-          expect(stats, isNull);
-        },
-        loading: () => fail('Should not be loading'),
-        error: (error, stack) => fail('Should not have error: $error'),
-      );
+      expect(stats, isNull);
     });
 
     test('weekly leaderboard provider returns data', () async {
-      final leaderboardAsync = container.read(weeklyLeaderboardProvider);
+      // Wait for the future to complete
+      final leaderboard =
+          await container.read(weeklyLeaderboardProvider.future);
 
-      await leaderboardAsync.when(
-        data: (leaderboard) {
-          expect(leaderboard, isNotEmpty);
-          expect(leaderboard.first.rank, 1);
-          expect(leaderboard.first.username, 'Alex Chen');
+      expect(leaderboard, isNotEmpty);
+      expect(leaderboard.first.rank, 1);
+      expect(leaderboard.first.username, 'Alex Chen');
 
-          // Should have current user marked
-          final currentUsers = leaderboard.where((user) => user.isCurrentUser);
-          expect(currentUsers, hasLength(1));
-        },
-        loading: () => fail('Should not be loading'),
-        error: (error, stack) => fail('Should not have error: $error'),
-      );
+      // Should have current user marked
+      final currentUsers = leaderboard.where((user) => user.isCurrentUser);
+      expect(currentUsers, hasLength(1));
     });
 
     test('monthly leaderboard provider returns data', () async {
-      final leaderboardAsync = container.read(monthlyLeaderboardProvider);
+      // Wait for the future to complete
+      final leaderboard =
+          await container.read(monthlyLeaderboardProvider.future);
 
-      await leaderboardAsync.when(
-        data: (leaderboard) {
-          expect(leaderboard, isNotEmpty);
-          expect(leaderboard.first.rank, 1);
-          expect(leaderboard.first.username, 'Sarah Johnson');
-        },
-        loading: () => fail('Should not be loading'),
-        error: (error, stack) => fail('Should not have error: $error'),
-      );
+      expect(leaderboard, isNotEmpty);
+      expect(leaderboard.first.rank, 1);
+      expect(leaderboard.first.username, 'Sarah Johnson');
     });
   });
 

@@ -96,14 +96,12 @@ void main() {
       test('should return user stats', () async {
         final stats = await progressService.getUserStats('test_user_id');
 
-        expect(stats.totalPoints, 125);
+        expect(stats.totalPoints, 1820);
         expect(stats.currentStreak, 7);
         expect(stats.longestStreak, 12);
-        expect(stats.totalScans, 45);
-        expect(stats.weeklyPoints, 35);
-        expect(stats.monthlyPoints, 125);
-        expect(stats.categoryCounts, isA<Map<String, int>>());
-        expect(stats.categoryCounts['Recyclable'], 25);
+        expect(stats.totalScans, 156);
+        expect(stats.categoryBreakdown, isA<Map<String, int>>());
+        expect(stats.categoryBreakdown['Plastic'], 45);
       });
 
       test('should return scan history', () async {
@@ -352,18 +350,27 @@ void main() {
   group('Stats Models Tests', () {
     test('UserStats should deserialize from JSON correctly', () {
       final json = {
+        'totalScans': 100,
         'totalPoints': 500,
         'currentStreak': 15,
         'longestStreak': 25,
-        'totalScans': 100,
-        'weeklyPoints': 75,
-        'monthlyPoints': 300,
-        'categoryCounts': {
-          'Recyclable': 60,
-          'Compostable': 30,
-          'Landfill': 8,
-          'Hazardous': 2,
+        'weeklyProgress': [5, 8, 3, 12, 6, 9, 4],
+        'monthlyProgress': [23, 31, 28, 35],
+        'categoryBreakdown': {
+          'Plastic': 60,
+          'Paper': 30,
+          'Metal': 8,
+          'Glass': 2,
         },
+        'environmentalImpact': {
+          'co2Saved': 15.6,
+          'waterSaved': 234.5,
+        },
+        'achievements': ['first_scan', 'eco_warrior'],
+        'recentScans': [],
+        'accuracyRate': 0.94,
+        'co2SavedKg': 15.6,
+        'wasteRecycledKg': 23.4,
       };
 
       final stats = UserStats.fromJson(json);
@@ -372,10 +379,8 @@ void main() {
       expect(stats.currentStreak, 15);
       expect(stats.longestStreak, 25);
       expect(stats.totalScans, 100);
-      expect(stats.weeklyPoints, 75);
-      expect(stats.monthlyPoints, 300);
-      expect(stats.categoryCounts['Recyclable'], 60);
-      expect(stats.categoryCounts['Hazardous'], 2);
+      expect(stats.categoryBreakdown['Plastic'], 60);
+      expect(stats.categoryBreakdown['Glass'], 2);
     });
 
     test('UserRankings should deserialize from JSON correctly', () {
