@@ -135,7 +135,6 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.primaryLight,
         surface: const Color(0xFF1E1E1E),
-        background: const Color(0xFF121212),
         error: AppColors.error,
       ),
       scaffoldBackgroundColor: const Color(0xFF121212),

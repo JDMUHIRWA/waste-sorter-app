@@ -71,7 +71,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         automaticallyImplyLeading: true,
         leading: IconButton(
           onPressed: () {
-            print('DEBUG: Back button pressed');
             context.go('/home');
           },
           icon: const Icon(Icons.arrow_back),
@@ -246,7 +245,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   ) {
     return GestureDetector(
       onTap: () {
-        print('Tapped on ${user.name}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Tapped on ${user.name} - ${user.points} points'),
@@ -339,7 +337,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
         return GestureDetector(
           onTap: () {
-            print('Tapped on leaderboard item: ${user.name}');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

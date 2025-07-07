@@ -239,7 +239,7 @@ void main() {
 
       final stopwatch = Stopwatch()..start();
       final leaderboardAsync = container.read(weeklyLeaderboardProvider);
-      await leaderboardAsync.when(
+      leaderboardAsync.when(
         data: (data) => data,
         loading: () => <LeaderboardUser>[],
         error: (error, stack) => <LeaderboardUser>[],

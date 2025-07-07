@@ -40,13 +40,11 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Future<void> _simulateAnalysis() async {
-    print('DEBUG: Starting analysis simulation');
     _progressController.forward();
 
     // Simulate AI processing time
     await Future.delayed(const Duration(seconds: 3));
 
-    print('DEBUG: Analysis complete, updating state');
     // Mock classification result
     setState(() {
       _isAnalyzing = false;

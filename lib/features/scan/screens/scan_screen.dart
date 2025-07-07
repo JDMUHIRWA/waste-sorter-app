@@ -166,7 +166,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.fitWidth,
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.width /
                           (_cameraController!.value.aspectRatio),

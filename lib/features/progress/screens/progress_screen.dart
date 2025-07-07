@@ -146,8 +146,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withOpacity(0.1),
-                  const Color(0xFF4CAF50).withOpacity(0.1),
+                  AppColors.primary.withValues(alpha: 0.1),
+                  const Color(0xFF4CAF50).withValues(alpha: 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -243,7 +243,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -283,7 +283,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -313,7 +313,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             value: (stats.weeklyProgress
                     .fold(0, (sum, count) => sum + count * 10)) /
                 100, // Assuming 100 points weekly goal
-            backgroundColor: AppColors.primary.withOpacity(0.1),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
           const SizedBox(height: 8),
@@ -321,7 +321,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             'Goal: 100 points/week',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary.withOpacity(0.7),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -337,7 +337,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -424,7 +424,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               const SizedBox(height: 4),
               LinearProgressIndicator(
                 value: percentage / 100,
-                backgroundColor: color.withOpacity(0.1),
+                backgroundColor: color.withValues(alpha: 0.1),
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ],
@@ -442,7 +442,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -479,7 +479,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -523,7 +523,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -535,7 +535,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, size: 28, color: color),
@@ -584,7 +584,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -602,9 +602,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             ),
           ),
           const SizedBox(height: 16),
-          Container(
+          const SizedBox(
             height: 120,
-            child: const Center(
+            child: Center(
               child: Text(
                 '📊 Chart Coming Soon',
                 style: TextStyle(
@@ -628,7 +628,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -640,7 +640,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -692,7 +692,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
           Icon(
             Icons.trending_up,
             size: 64,
-            color: AppColors.textSecondary.withOpacity(0.5),
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           const Text(
