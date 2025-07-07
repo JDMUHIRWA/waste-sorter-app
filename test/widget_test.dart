@@ -19,11 +19,12 @@ void main() {
 
       // Wait for initial rendering
       await tester.pump();
-      
+
       // Check if we have either a loading state or the splash screen
-      final hasLoadingIndicator = find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+      final hasLoadingIndicator =
+          find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
       final hasSplashScreen = find.byType(SplashScreen).evaluate().isNotEmpty;
-      
+
       expect(hasLoadingIndicator || hasSplashScreen, isTrue);
     });
 
@@ -73,12 +74,12 @@ void main() {
         );
         await tester.pump();
 
-        // App should build properly 
+        // App should build properly
         expect(find.byType(WasteSorterApp), findsOneWidget);
-        
+
         // Wait for settings to load and then check if we can navigate
         await tester.pump(const Duration(milliseconds: 100));
-        
+
         // The actual navigation testing will be expanded as we implement full navigation
       });
 
@@ -92,7 +93,7 @@ void main() {
 
         // Verify app builds properly
         expect(find.byType(WasteSorterApp), findsOneWidget);
-        
+
         // Test back button functionality (will be implemented in navigation flow)
         // This test will be expanded as we implement the full navigation
       });
