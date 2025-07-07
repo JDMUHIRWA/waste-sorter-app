@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:waste_sorter_app/services/authentication/auth.dart';
 import '../../../core/constants/app_constants.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -22,10 +23,31 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _handleSignIn() {
+  void _handleSignIn() async {
     if (_formKey.currentState!.validate()) {
-      // Handle sign in logic
-      context.go('/home');
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      try {
+        final authService = AuthService();
+        final user =
+            await authService.signInWithEmail(email: email, password: password);
+
+        if (!mounted) return;
+
+        if (user != null) {
+          context.go('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User not found')),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 

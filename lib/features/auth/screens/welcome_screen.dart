@@ -49,7 +49,7 @@ class WelcomeScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () => context.go('/signup'),
+                      onPressed: () => context.push('/signup'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -142,7 +142,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => context.go('/signin'),
+                    onTap: () => context.push('/signin'),
                     child: const Text(
                       'Log In',
                       style: TextStyle(

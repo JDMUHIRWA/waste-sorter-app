@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "251669996098",
+    "project_id": "waste-sorter-7f046",
+    "storage_bucket": "waste-sorter-7f046.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251669996098:android:e48b58b6db8cadf0dfc3db",
+        "android_client_info": {
+          "package_name": "com.example.waste_sorter_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "251669996098-35cjirockk04p6e096v0kqou0oq0equ5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI7YuMYMEhwlc7upYD8PFc9ID6hTR6pHk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "251669996098-35cjirockk04p6e096v0kqou0oq0equ5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "251669996098-iq4hpcu9bot07v0dvkg2s91mmuckpmj9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.wasteSorterApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

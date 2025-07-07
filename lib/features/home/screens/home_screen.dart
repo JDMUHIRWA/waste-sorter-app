@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:waste_sorter_app/services/authentication/auth.dart';
 import '../../../core/constants/app_constants.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +12,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  String _userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user name from auth service or state management
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final authService = AuthService();
+    final user = await authService.getCurrentUser();
+
+    if (user != null && mounted) {
+      setState(() {
+        _userName = user.name ?? 'User'; // fallback if name is null
+      });
+    }
+  }
 
   final List<Map<String, dynamic>> _tipOfTheWeek = [
     {
@@ -79,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Good Morning, James',
+                          'Good Morning, $_userName',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
