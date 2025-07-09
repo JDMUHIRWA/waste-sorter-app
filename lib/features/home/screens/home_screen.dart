@@ -1,36 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:waste_sorter_app/services/authentication/auth.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../services/app_services.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
-  String _userName = '';
-
-  @override
-  void initState() {
-    super.initState();
-    // Fetch user name from auth service or state management
-    _loadUserName();
-  }
-
-  Future<void> _loadUserName() async {
-    final authService = AuthService();
-    final user = await authService.getCurrentUser();
-
-    if (user != null && mounted) {
-      setState(() {
-        _userName = user.name ?? 'User'; // fallback if name is null
-      });
-    }
-  }
 
   final List<Map<String, dynamic>> _tipOfTheWeek = [
     {
@@ -59,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case 2:
         // Progress/Stats
+        context.go('/progress');
         break;
       case 3:
         context.go('/settings');
@@ -66,8 +49,56 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _buildNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required int index,
+  }) {
+    final isActive = _currentIndex == index;
+    final theme = Theme.of(context);
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onBottomNavTap(index),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isActive ? activeIcon : icon,
+                color: isActive
+                    ? AppColors.primary
+                    : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                        Colors.grey,
+                size: 24,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  color: isActive
+                      ? AppColors.primary
+                      : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                          Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = ref.watch(currentUserProvider);
+    final userName = currentUser?.username ?? 'User';
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -99,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Good Morning, $_userName',
+                          'Good Morning, $userName',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -259,34 +290,47 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavTap,
-        type: BottomNavigationBarType.fixed,
+      // Bottom Navigation with BottomAppBar for better FAB integration
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        height: 70,
         elevation: 8,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.leaderboard_outlined),
-            activeIcon: Icon(Icons.leaderboard),
-            label: 'Leaderboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up_outlined),
-            activeIcon: Icon(Icons.trending_up),
-            label: 'Progress',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            // Home
+            _buildNavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
+              label: 'Home',
+              index: 0,
+            ),
+            // Leaderboard
+            _buildNavItem(
+              icon: Icons.leaderboard_outlined,
+              activeIcon: Icons.leaderboard,
+              label: 'Leaderboard',
+              index: 1,
+            ),
+            // Spacer for FAB
+            const SizedBox(width: 80), // Space for the FAB
+            // Progress
+            _buildNavItem(
+              icon: Icons.trending_up_outlined,
+              activeIcon: Icons.trending_up,
+              label: 'Progress',
+              index: 2,
+            ),
+            // Settings
+            _buildNavItem(
+              icon: Icons.settings_outlined,
+              activeIcon: Icons.settings,
+              label: 'Settings',
+              index: 3,
+            ),
+          ],
+        ),
       ),
     );
   }
