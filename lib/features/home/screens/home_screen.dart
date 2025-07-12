@@ -61,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Expanded(
       child: InkWell(
         onTap: () => _onBottomNavTap(index),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
@@ -73,13 +73,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ? AppColors.primary
                     : theme.bottomNavigationBarTheme.unselectedItemColor ??
                         Colors.grey,
-                size: 24,
+                size: 21,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                   color: isActive
                       ? AppColors.primary
@@ -294,7 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
-        height: 70,
+        height: 80,
         elevation: 8,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
