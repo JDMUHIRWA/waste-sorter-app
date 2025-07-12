@@ -53,11 +53,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         'confidence': 0.92,
         'itemType': 'Plastic Bottle',
         'material': 'PET Plastic',
-        'instructions': [
-          'Remove Cap',
-          'Rinse Item', 
-          'Place in Blue Bin'
-        ],
+        'instructions': ['Remove Cap', 'Rinse Item', 'Place in Blue Bin'],
         'environmentalImpact': {
           'co2Saved': '0.2 kg',
           'energySaved': '1.5 kWh',
@@ -371,47 +367,46 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                         .asMap()
                         .entries
                         .map<Widget>((entry) {
-                          final index = entry.key;
-                          final instruction = entry.value;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  margin: const EdgeInsets.only(right: 16),
-                                  decoration: BoxDecoration(
-                                    color: categoryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${index + 1}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                      final index = entry.key;
+                      final instruction = entry.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 28,
+                              height: 28,
+                              margin: const EdgeInsets.only(right: 16),
+                              decoration: BoxDecoration(
+                                color: categoryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    instruction,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          );
-                        })
-                        .toList(),
+                            Expanded(
+                              child: Text(
+                                instruction,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
 
@@ -547,7 +542,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

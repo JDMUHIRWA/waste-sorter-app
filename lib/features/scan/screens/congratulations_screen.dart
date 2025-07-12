@@ -92,8 +92,9 @@ class _CongratulationsScreenState extends State<CongratulationsScreen>
                       onPressed: () => context.go('/home'),
                       icon: const Icon(Icons.close),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.textSecondary,
+                        backgroundColor: Theme.of(context).cardTheme.color,
+                        foregroundColor:
+                            Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                   ],

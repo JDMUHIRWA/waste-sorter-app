@@ -7,7 +7,8 @@ void main() {
       expect(true, isTrue); // Placeholder test
     }, skip: true);
 
-    testWidgets('Leaderboard podium displays correctly', (WidgetTester tester) async {
+    testWidgets('Leaderboard podium displays correctly',
+        (WidgetTester tester) async {
       // Temporarily disabled - requires proper Riverpod providers
       expect(true, isTrue); // Placeholder test
     }, skip: true);
