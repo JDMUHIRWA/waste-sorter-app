@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:waste_sorter_app/models/app_settings.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../services/app_services.dart';
-import '../../../models/user_models.dart';
+import '../../../services/settings-preferences/provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

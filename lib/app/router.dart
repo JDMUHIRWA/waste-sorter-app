@@ -13,9 +13,11 @@ import '../features/scan/screens/confirmation_screen.dart';
 import '../features/scan/screens/congratulations_screen.dart';
 import '../features/leaderboard/screens/leaderboard_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
+import '../features/progress/screens/progress_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  debugLogDiagnostics: true,
   routes: [
     GoRoute(
       path: '/',
@@ -97,5 +99,16 @@ final GoRouter appRouter = GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
     ),
+    GoRoute(
+      path: '/progress',
+      builder: (context, state) => const ProgressScreen(),
+    ),
   ],
+  errorBuilder: (context, state) {
+    return Scaffold(
+      body: Center(
+        child: Text('Error: ${state.error}'),
+      ),
+    );
+  },
 );
