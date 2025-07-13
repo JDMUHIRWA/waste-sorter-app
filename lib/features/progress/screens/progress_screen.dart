@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../services/app_services.dart';
-import '../../../models/user_models.dart';
+import '../../../services/progress/progress_provider.dart';
+import '../../../models/user_stats.dart';
+import '../../../models/scan_history_entry.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -33,6 +35,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            context.go('/home');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Your Progress',
           style: TextStyle(
@@ -218,7 +226,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   }
 
   Widget _buildHistoryTab() {
-    final historyAsync = ref.watch(_scanHistoryProvider);
+    final historyAsync = ref.watch(scanHistoryProvider);
 
     return historyAsync.when(
       data: (history) => ListView.builder(
@@ -239,7 +247,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -264,9 +272,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
           const SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
             textAlign: TextAlign.center,
           ),
@@ -279,7 +287,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -333,7 +341,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -761,13 +769,3 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return '${date.day}/${date.month}';
   }
 }
-
-// Provider for scan history
-final _scanHistoryProvider =
-    FutureProvider<List<ScanHistoryEntry>>((ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) return [];
-
-  final progressService = ref.read(progressServiceProvider);
-  return await progressService.getScanHistory(user.id, limit: 20);
-});

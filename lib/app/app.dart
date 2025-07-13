@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
-import '../services/app_services.dart';
 import 'router.dart';
+import '../services/settings-preferences/provider.dart';
 
 class WasteSorterApp extends ConsumerWidget {
   const WasteSorterApp({super.key});
@@ -10,7 +10,6 @@ class WasteSorterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsNotifierProvider);
-
     return settingsAsync.when(
       data: (settings) => MaterialApp.router(
         title: 'WasteSorter',

@@ -1,12 +1,12 @@
 // lib/features/auth/services/auth_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../db-models/users.dart';
+import 'package:waste_sorter_app/models/user_models.dart';
 
 class AuthService {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-
+  FirebaseFirestore get firestore => _firestore;
   // Create new account and save to Firestore
   Future<void> signUpWithEmail({
     required String email,
