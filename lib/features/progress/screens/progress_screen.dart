@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../models/user_models.dart';
 import '../../../services/progress/progress_provider.dart';
 import '../../../models/user_stats.dart';
 import '../../../models/scan_history_entry.dart';
-import '../../../services/authentication/provider.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
