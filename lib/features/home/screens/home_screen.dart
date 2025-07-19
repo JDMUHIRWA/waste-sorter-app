@@ -59,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final mediaQuery = MediaQuery.of(context);
-    
+
     // Shorten labels on very small screens
     String displayLabel = label;
     if (mediaQuery.size.width < 400) {
@@ -105,7 +105,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                       color: isActive
                           ? colorScheme.primary
-                          : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                          : theme.bottomNavigationBarTheme
+                                  .unselectedItemColor ??
                               colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     textAlign: TextAlign.center,
@@ -217,8 +218,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color:
-                                      colorScheme.primary.withValues(alpha: 0.1),
+                                  color: colorScheme.primary
+                                      .withValues(alpha: 0.1),
                                   borderRadius:
                                       BorderRadius.circular(AppRadius.md),
                                 ),

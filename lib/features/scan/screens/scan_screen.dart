@@ -305,7 +305,10 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
@@ -381,9 +384,11 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                               left: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                             ),
                           ),
                         ),
@@ -397,9 +402,11 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                               right: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                             ),
                           ),
                         ),
@@ -413,9 +420,11 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                               left: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                             ),
                           ),
                         ),
@@ -429,9 +438,11 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                               right: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 3),
                             ),
                           ),
                         ),
@@ -484,7 +495,8 @@ class _ScanScreenState extends State<ScanScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+            CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 16),
             const Text(
               'Initializing camera...',
@@ -533,7 +545,8 @@ class _ScanScreenState extends State<ScanScreen> {
                 onPressed: _pickImageFromGallery,
                 child: Text(
                   'Choose from Gallery',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
                 ),
               ),
             ],

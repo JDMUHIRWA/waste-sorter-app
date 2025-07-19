@@ -12,6 +12,7 @@ import '../features/scan/screens/disposal_instructions_screen.dart';
 import '../features/scan/screens/confirmation_screen.dart';
 import '../features/scan/screens/congratulations_screen.dart';
 import '../features/leaderboard/screens/leaderboard_screen.dart';
+import '../features/progress/screens/progress_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -92,6 +93,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/leaderboard',
       builder: (context, state) => const LeaderboardScreen(),
+    ),
+    GoRoute(
+      path: '/progress',
+      builder: (context, state) => const ProgressScreen(),
     ),
     GoRoute(
       path: '/settings',
