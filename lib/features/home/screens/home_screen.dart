@@ -57,6 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     final isActive = _currentIndex == index;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final mediaQuery = MediaQuery.of(context);
     
     // Shorten labels on very small screens
@@ -88,9 +89,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Icon(
                 isActive ? activeIcon : icon,
                 color: isActive
-                    ? AppColors.primary
+                    ? colorScheme.primary
                     : theme.bottomNavigationBarTheme.unselectedItemColor ??
-                        Colors.grey,
+                        colorScheme.onSurface.withValues(alpha: 0.6),
                 size: 18,
               ),
               const SizedBox(height: 1),
@@ -103,9 +104,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontSize: 9,
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                       color: isActive
-                          ? AppColors.primary
+                          ? colorScheme.primary
                           : theme.bottomNavigationBarTheme.unselectedItemColor ??
-                              Colors.grey,
+                              colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -124,6 +125,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider);
     final userName = currentUser?.username ?? 'User';
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -140,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       borderRadius: BorderRadius.circular(AppRadius.circular),
                     ),
                     child: const Icon(
@@ -215,13 +218,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 height: 60,
                                 decoration: BoxDecoration(
                                   color:
-                                      AppColors.primary.withValues(alpha: 0.1),
+                                      colorScheme.primary.withValues(alpha: 0.1),
                                   borderRadius:
                                       BorderRadius.circular(AppRadius.md),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.recycling,
-                                  color: AppColors.primary,
+                                  color: colorScheme.primary,
                                   size: 30,
                                 ),
                               ),
@@ -277,14 +280,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.primary,
-              AppColors.primary.withValues(alpha: 0.8),
+              colorScheme.primary,
+              colorScheme.primary.withValues(alpha: 0.8),
             ],
           ),
           borderRadius: BorderRadius.circular(40),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),

@@ -274,6 +274,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
     final categoryColor = _getCategoryColor(result['category']);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth > 600 ? 600.0 : screenWidth;
 
     return Container(
       decoration: BoxDecoration(
@@ -295,258 +297,349 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
             parent: _slideController,
             curve: Curves.easeOutCubic,
           )),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Classification Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.shadow.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: categoryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          _getCategoryIcon(result['category']),
-                          color: Colors.white,
-                          size: 40,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        result['category'],
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: categoryColor,
-                        ),
-                      ),
-                      Text(
-                        result['itemType'],
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: categoryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Confidence: ${(result['confidence'] * 100).toInt()}%',
-                          style: TextStyle(
-                            color: categoryColor,
-                            fontWeight: FontWeight.w600,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxWidth,
+              ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(screenWidth > 600 ? 32 : 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Classification Card
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(screenWidth > 600 ? 32 : 20),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.shadow.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            spreadRadius: 2,
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Disposal Instructions
-                _buildSection(
-                  'Disposal Instructions',
-                  Icons.assignment_turned_in,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: result['instructions']
-                        .asMap()
-                        .entries
-                        .map<Widget>((entry) {
-                      final index = entry.key;
-                      final instruction = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-                              margin: const EdgeInsets.only(right: 16),
-                              decoration: BoxDecoration(
-                                color: categoryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${index + 1}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                instruction,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.5,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Environmental Impact
-                _buildSection(
-                  'Environmental Impact',
-                  Icons.eco,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: _buildImpactMetric(
-                              'CO₂ Saved',
-                              result['environmentalImpact']['co2Saved'],
-                              Icons.cloud_off,
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: categoryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _getCategoryIcon(result['category']),
+                              color: Colors.white,
+                              size: 40,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildImpactMetric(
-                              'Energy Saved',
-                              result['environmentalImpact']['energySaved'],
-                              Icons.flash_on,
+                          const SizedBox(height: 16),
+                          Text(
+                            result['category'],
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: categoryColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            result['itemType'],
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: categoryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'Confidence: ${(result['confidence'] * 100).toInt()}%',
+                              style: TextStyle(
+                                color: categoryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        result['environmentalImpact']['description'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
 
-                const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                // Alternative Uses
-                _buildSection(
-                  'Creative Reuse Ideas',
-                  Icons.lightbulb,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: result['alternativeUses']
-                        .map<Widget>((use) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.lightbulb_outline,
-                                    size: 16,
-                                    color: colorScheme.primary,
+                    // Disposal Instructions
+                    _buildSection(
+                      'Disposal Instructions',
+                      Icons.assignment_turned_in,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: result['instructions']
+                            .asMap()
+                            .entries
+                            .map<Widget>((entry) {
+                          final index = entry.key;
+                          final instruction = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  margin: const EdgeInsets.only(right: 16),
+                                  decoration: BoxDecoration(
+                                    color: categoryColor,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
+                                  child: Center(
                                     child: Text(
-                                      use,
-                                      style: TextStyle(
+                                      '${index + 1}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
                                         fontSize: 14,
-                                        color: colorScheme.onSurface,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.push('/congratulations', extra: {
-                            'category': result['category'],
-                            'points': 5,
-                            'streak': 1,
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: categoryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'I\'ve Sorted It',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    instruction,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.5,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    OutlinedButton(
-                      onPressed: () => context.pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: categoryColor),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+
+                    const SizedBox(height: 24),
+
+                    // Environmental Impact
+                    _buildSection(
+                      'Environmental Impact',
+                      Icons.eco,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              if (constraints.maxWidth < 400) {
+                                // Stack vertically on small screens
+                                return Column(
+                                  children: [
+                                    _buildImpactMetric(
+                                      'CO₂ Saved',
+                                      result['environmentalImpact']['co2Saved'],
+                                      Icons.cloud_off,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildImpactMetric(
+                                      'Energy Saved',
+                                      result['environmentalImpact']['energySaved'],
+                                      Icons.flash_on,
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                // Side by side on larger screens
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildImpactMetric(
+                                        'CO₂ Saved',
+                                        result['environmentalImpact']['co2Saved'],
+                                        Icons.cloud_off,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildImpactMetric(
+                                        'Energy Saved',
+                                        result['environmentalImpact']['energySaved'],
+                                        Icons.flash_on,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            result['environmentalImpact']['description'],
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ],
                       ),
-                      child: const Icon(Icons.camera_alt),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Alternative Uses
+                    _buildSection(
+                      'Creative Reuse Ideas',
+                      Icons.lightbulb,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: result['alternativeUses']
+                            .map<Widget>((use) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.lightbulb_outline,
+                                        size: 16,
+                                        color: colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          use,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Action Buttons
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth < 400) {
+                          // Stack vertically on small screens
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.push('/congratulations', extra: {
+                                    'category': result['category'],
+                                    'points': 5,
+                                    'streak': 1,
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: categoryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'I\'ve Sorted It',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              OutlinedButton(
+                                onPressed: () => context.pop(),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: categoryColor),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.camera_alt),
+                                    const SizedBox(width: 8),
+                                    const Text('Scan Another'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
+                          // Side by side on larger screens
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    context.push('/congratulations', extra: {
+                                      'category': result['category'],
+                                      'points': 5,
+                                      'streak': 1,
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: categoryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'I\'ve Sorted It',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              OutlinedButton(
+                                onPressed: () => context.pop(),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: categoryColor),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Icon(Icons.camera_alt),
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

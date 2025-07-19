@@ -3,7 +3,6 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_constants.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -298,7 +297,7 @@ class _ScanScreenState extends State<ScanScreen> {
                             decoration: BoxDecoration(
                               color: _isLoading
                                   ? Colors.grey.withValues(alpha: 0.5)
-                                  : AppColors.primary,
+                                  : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: Colors.white,
@@ -306,8 +305,7 @@ class _ScanScreenState extends State<ScanScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color:
-                                      AppColors.primary.withValues(alpha: 0.3),
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 2,
                                 ),
@@ -366,7 +364,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   height: 250,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -383,9 +381,9 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                               left: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                             ),
                           ),
                         ),
@@ -399,9 +397,9 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                               right: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                             ),
                           ),
                         ),
@@ -415,9 +413,9 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                               left: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                             ),
                           ),
                         ),
@@ -431,9 +429,9 @@ class _ScanScreenState extends State<ScanScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                               right: BorderSide(
-                                  color: AppColors.primary, width: 3),
+                                  color: Theme.of(context).colorScheme.primary, width: 3),
                             ),
                           ),
                         ),
@@ -453,7 +451,7 @@ class _ScanScreenState extends State<ScanScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.error,
+                  color: Theme.of(context).colorScheme.error,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -482,13 +480,13 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget _buildLoadingState() {
     return Container(
       color: Colors.black,
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppColors.primary),
-            SizedBox(height: 16),
-            Text(
+            CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 16),
+            const Text(
               'Initializing camera...',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
@@ -525,7 +523,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ElevatedButton(
                 onPressed: _initializeCamera,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Try Again'),
@@ -533,9 +531,9 @@ class _ScanScreenState extends State<ScanScreen> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: _pickImageFromGallery,
-                child: const Text(
+                child: Text(
                   'Choose from Gallery',
-                  style: TextStyle(color: AppColors.primary),
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
                 ),
               ),
             ],
