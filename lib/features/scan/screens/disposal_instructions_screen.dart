@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_constants.dart';
 
 class DisposalInstructionsScreen extends StatefulWidget {
   final String imagePath;
@@ -72,17 +71,22 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Color _getCategoryColor(String category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     switch (category.toLowerCase()) {
       case 'recyclable':
-        return const Color(0xFF4CAF50);
-      case 'compostable':
-        return const Color(0xFF8BC34A);
-      case 'landfill':
-        return const Color(0xFF757575);
+        return const Color(0xFF4CAF50); // Green
+      case 'compost':
+        return const Color(0xFF8BC34A); // Light Green
       case 'hazardous':
-        return const Color(0xFFF44336);
+        return const Color(0xFFFF5722); // Deep Orange
+      case 'electronic':
+        return const Color(0xFF2196F3); // Blue
+      case 'trash':
+        return const Color(0xFF9E9E9E); // Grey
       default:
-        return AppColors.primary;
+        return colorScheme.primary;
     }
   }
 
@@ -110,22 +114,25 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
-            color: AppColors.textPrimary,
+            color: colorScheme.onSurface,
           ),
         ),
         title: Text(
           _isAnalyzing ? 'Analyzing Item' : 'Disposal Instructions',
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: colorScheme.onSurface,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -137,9 +144,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   onPressed: () {
                     // TODO: Share functionality
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.share,
-                    color: AppColors.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ]
@@ -150,14 +157,19 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildAnalyzingState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageSize = screenWidth * 0.6 > 300 ? 300.0 : screenWidth * 0.6;
+    
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withValues(alpha: 0.1),
-            AppColors.background,
+            colorScheme.primary.withValues(alpha: 0.1),
+            colorScheme.surface,
           ],
         ),
       ),
@@ -170,13 +182,13 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
 
               // Captured Image
               Container(
-                width: 250,
-                height: 250,
+                width: imageSize,
+                height: imageSize,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -200,19 +212,19 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.psychology,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           size: 30,
                         ),
                       ),
@@ -221,27 +233,26 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                         width: 200,
                         child: LinearProgressIndicator(
                           value: _progressController.value,
-                          backgroundColor: Colors.grey[300],
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          backgroundColor: colorScheme.outline.withValues(alpha: 0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                           minHeight: 6,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         '${(_progressController.value * 100).toInt()}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'AI is analyzing your waste item...',
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -261,6 +272,8 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   Widget _buildResultState() {
     final result = _classificationResult!;
     final categoryColor = _getCategoryColor(result['category']);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
@@ -269,7 +282,7 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
           end: Alignment.bottomCenter,
           colors: [
             categoryColor.withValues(alpha: 0.1),
-            AppColors.background,
+            colorScheme.surface,
           ],
         ),
       ),
@@ -292,11 +305,11 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: colorScheme.shadow.withValues(alpha: 0.1),
                         blurRadius: 20,
                         spreadRadius: 2,
                       ),
@@ -328,9 +341,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                       ),
                       Text(
                         result['itemType'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -396,10 +409,11 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                             Expanded(
                               child: Text(
                                 instruction,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   height: 1.5,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -441,10 +455,10 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                       const SizedBox(height: 16),
                       Text(
                         result['environmentalImpact']['description'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontStyle: FontStyle.italic,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -467,13 +481,16 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                                   Icon(
                                     Icons.lightbulb_outline,
                                     size: 16,
-                                    color: AppColors.primary,
+                                    color: colorScheme.primary,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       use,
-                                      style: const TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: colorScheme.onSurface,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -538,15 +555,18 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildSection(String title, IconData icon, Widget content) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -557,13 +577,14 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -576,29 +597,32 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildImpactMetric(String label, String value, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.primary, size: 24),
+          Icon(icon, color: colorScheme.primary, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -607,25 +631,28 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildImageWidget() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     if (kIsWeb) {
       // For web, show a placeholder since we can't access the file system
       return Container(
         width: double.infinity,
         height: 250,
-        color: AppColors.primary.withValues(alpha: 0.1),
-        child: const Column(
+        color: colorScheme.primary.withValues(alpha: 0.1),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.image,
               size: 48,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Image Preview',
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -643,20 +670,20 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
             return Container(
               width: double.infinity,
               height: 250,
-              color: AppColors.primary.withValues(alpha: 0.1),
-              child: const Column(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.broken_image,
                     size: 48,
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Failed to load image',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -668,20 +695,20 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         return Container(
           width: double.infinity,
           height: 250,
-          color: AppColors.primary.withValues(alpha: 0.1),
-          child: const Column(
+          color: colorScheme.primary.withValues(alpha: 0.1),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.error,
                 size: 48,
-                color: AppColors.primary,
+                color: colorScheme.primary,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 'Image unavailable',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],

@@ -57,15 +57,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     final isActive = _currentIndex == index;
     final theme = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    
+    // Shorten labels on very small screens
+    String displayLabel = label;
+    if (mediaQuery.size.width < 400) {
+      switch (label) {
+        case 'Leaderboard':
+          displayLabel = 'Rank';
+          break;
+        case 'Progress':
+          displayLabel = 'Stats';
+          break;
+        case 'Settings':
+          displayLabel = 'More';
+          break;
+      }
+    }
 
     return Expanded(
       child: InkWell(
         onTap: () => _onBottomNavTap(index),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 isActive ? activeIcon : icon,
@@ -73,18 +91,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ? AppColors.primary
                     : theme.bottomNavigationBarTheme.unselectedItemColor ??
                         Colors.grey,
-                size: 24,
+                size: 18,
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  color: isActive
-                      ? AppColors.primary
-                      : theme.bottomNavigationBarTheme.unselectedItemColor ??
-                          Colors.grey,
+              const SizedBox(height: 1),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    displayLabel,
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                      color: isActive
+                          ? AppColors.primary
+                          : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                              Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
@@ -293,43 +319,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // Bottom Navigation with BottomAppBar for better FAB integration
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        height: 70,
+        notchMargin: 6.0,
+        height: 60,
         elevation: 8,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // Home
-            _buildNavItem(
-              icon: Icons.home_outlined,
-              activeIcon: Icons.home,
-              label: 'Home',
-              index: 0,
-            ),
-            // Leaderboard
-            _buildNavItem(
-              icon: Icons.leaderboard_outlined,
-              activeIcon: Icons.leaderboard,
-              label: 'Leaderboard',
-              index: 1,
-            ),
-            // Spacer for FAB
-            const SizedBox(width: 80), // Space for the FAB
-            // Progress
-            _buildNavItem(
-              icon: Icons.trending_up_outlined,
-              activeIcon: Icons.trending_up,
-              label: 'Progress',
-              index: 2,
-            ),
-            // Settings
-            _buildNavItem(
-              icon: Icons.settings_outlined,
-              activeIcon: Icons.settings,
-              label: 'Settings',
-              index: 3,
-            ),
-          ],
+        child: Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // Home
+              _buildNavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: 'Home',
+                index: 0,
+              ),
+              // Leaderboard
+              _buildNavItem(
+                icon: Icons.leaderboard_outlined,
+                activeIcon: Icons.leaderboard,
+                label: 'Leaderboard',
+                index: 1,
+              ),
+              // Spacer for FAB
+              const SizedBox(width: 50), // Space for the FAB
+              // Progress
+              _buildNavItem(
+                icon: Icons.trending_up_outlined,
+                activeIcon: Icons.trending_up,
+                label: 'Progress',
+                index: 2,
+              ),
+              // Settings
+              _buildNavItem(
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings,
+                label: 'Settings',
+                index: 3,
+              ),
+            ],
+          ),
         ),
       ),
     );
