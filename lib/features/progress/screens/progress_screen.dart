@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../services/app_services.dart';
-import '../../../models/user_models.dart';
+import '../../../services/progress/progress_provider.dart';
+import '../../../models/user_stats.dart';
+import '../../../models/scan_history_entry.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -231,7 +232,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   }
 
   Widget _buildHistoryTab() {
-    final historyAsync = ref.watch(_scanHistoryProvider);
+    final historyAsync = ref.watch(scanHistoryProvider);
 
     return historyAsync.when(
       data: (history) => ListView.builder(
@@ -249,10 +250,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
 
   Widget _buildStatCard(
       String title, String value, IconData icon, Color color) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -279,7 +282,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             title,
             style: TextStyle(
               fontSize: 14,
-              color: Theme.of(context).textTheme.bodySmall?.color,
+              color: theme.textTheme.bodySmall?.color,
             ),
             textAlign: TextAlign.center,
           ),
@@ -705,23 +708,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
       currentStreak: 7,
       longestStreak: 12,
       weeklyProgress: [3, 2, 4, 6, 5, 3, 7], // Last 7 days
-      monthlyProgress: [15, 18, 12, 20], // Last 4 weeks
       categoryBreakdown: {
         'Recyclable': 25,
         'Compostable': 12,
         'Hazardous': 3,
         'Landfill': 5,
       },
-      environmentalImpact: {
-        'co2_saved': 12.5,
-        'water_saved': 150.0,
-        'energy_saved': 25.0,
-      },
-      achievements: ['first_scan', 'week_streak', 'eco_warrior'],
-      recentScans: [], // Empty for now
-      accuracyRate: 0.89,
-      co2SavedKg: 12.5,
-      wasteRecycledKg: 8.3,
     );
 
     return TabBarView(
@@ -778,13 +770,3 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return '${date.day}/${date.month}';
   }
 }
-
-// Provider for scan history
-final _scanHistoryProvider =
-    FutureProvider<List<ScanHistoryEntry>>((ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) return [];
-
-  final progressService = ref.read(progressServiceProvider);
-  return await progressService.getScanHistory(user.id, limit: 20);
-});
