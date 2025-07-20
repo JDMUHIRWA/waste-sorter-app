@@ -32,14 +32,14 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   @override
   Widget build(BuildContext context) {
     final userStatsAsync = ref.watch(userStatsProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            context.go('/home');
-          },
           icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
         ),
         title: const Text(
           'Your Progress',
@@ -52,7 +52,13 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: colorScheme.primary,
+          labelColor: Colors.white, // White text for selected tab
+          unselectedLabelColor: colorScheme.onSurface.withValues(alpha: 0.6),
+          indicator: BoxDecoration(
+            color: colorScheme.primary,
+            borderRadius: BorderRadius.circular(25),
+          ),
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'Impact'),
@@ -70,7 +76,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                   _buildHistoryTab(),
                 ],
               )
-            : _buildSignInPrompt(),
+            : _buildDevelopmentMockData(), // Show mock data for development
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildErrorState(error.toString()),
       ),
@@ -244,10 +250,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
 
   Widget _buildStatCard(
       String title, String value, IconData icon, Color color) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -274,7 +282,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             title,
             style: TextStyle(
               fontSize: 14,
-              color: Theme.of(context).textTheme.bodySmall?.color,
+              color: theme.textTheme.bodySmall?.color,
             ),
             textAlign: TextAlign.center,
           ),
@@ -692,36 +700,29 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     );
   }
 
-  Widget _buildSignInPrompt() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.trending_up,
-            size: 64,
-            color: AppColors.textSecondary.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Sign in to view your progress',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Track your environmental impact and achievements',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+  Widget _buildDevelopmentMockData() {
+    // Create mock stats for development/demo purposes
+    final mockStats = UserStats(
+      totalScans: 45,
+      totalPoints: 215,
+      currentStreak: 7,
+      longestStreak: 12,
+      weeklyProgress: [3, 2, 4, 6, 5, 3, 7], // Last 7 days
+      categoryBreakdown: {
+        'Recyclable': 25,
+        'Compostable': 12,
+        'Hazardous': 3,
+        'Landfill': 5,
+      },
+    );
+
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        _buildOverviewTab(mockStats),
+        _buildImpactTab(mockStats),
+        _buildHistoryTab(),
+      ],
     );
   }
 

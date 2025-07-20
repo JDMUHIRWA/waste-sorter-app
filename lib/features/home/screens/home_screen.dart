@@ -57,34 +57,63 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     final isActive = _currentIndex == index;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final mediaQuery = MediaQuery.of(context);
+
+    // Shorten labels on very small screens
+    String displayLabel = label;
+    if (mediaQuery.size.width < 380) {
+      switch (label) {
+        case 'Leaderboard':
+          displayLabel = 'Rank';
+          break;
+        case 'Progress':
+          displayLabel = 'Stats';
+          break;
+        case 'Settings':
+          displayLabel = 'More';
+          break;
+      }
+    }
 
     return Expanded(
       child: InkWell(
         onTap: () => _onBottomNavTap(index),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          constraints: const BoxConstraints(maxHeight: 65), // Add height constraint
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2), // Reduced padding
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 isActive ? activeIcon : icon,
                 color: isActive
-                    ? AppColors.primary
+                    ? colorScheme.primary
                     : theme.bottomNavigationBarTheme.unselectedItemColor ??
-                        Colors.grey,
-                size: 21,
+                        colorScheme.onSurface.withValues(alpha: 0.6),
+                size: 22, // Slightly reduced from 24 to 22
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  color: isActive
-                      ? AppColors.primary
-                      : theme.bottomNavigationBarTheme.unselectedItemColor ??
-                          Colors.grey,
+              const SizedBox(height: 2), // Reduced from 4 to 2
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    displayLabel,
+                    style: TextStyle(
+                      fontSize: 10, // Reduced from 11 to 10
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                      color: isActive
+                          ? colorScheme.primary
+                          : theme.bottomNavigationBarTheme
+                                  .unselectedItemColor ??
+                              colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
@@ -96,10 +125,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userAsync = ref.watch(currentUserProvider);
-    return userAsync.when(
-      data: (user) {
-        final name = user?.name ?? 'User';
+    final currentUserAsync = ref.watch(currentUserProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return currentUserAsync.when(
+      data: (currentUser) {
+        final userName = currentUser?.name ?? 'User';
+
         return Scaffold(
           body: SafeArea(
             child: Padding(
@@ -115,7 +148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                           borderRadius:
                               BorderRadius.circular(AppRadius.circular),
                         ),
@@ -132,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Good Morning, $name!',
+                              'Good Morning, $userName',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -194,14 +227,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary
+                                      color: colorScheme.primary
                                           .withValues(alpha: 0.1),
                                       borderRadius:
                                           BorderRadius.circular(AppRadius.md),
                                     ),
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.recycling,
-                                      color: AppColors.primary,
+                                      color: colorScheme.primary,
                                       size: 30,
                                     ),
                                   ),
@@ -258,14 +291,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.8),
+                  colorScheme.primary,
+                  colorScheme.primary.withValues(alpha: 0.8),
                 ],
               ),
               borderRadius: BorderRadius.circular(40),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -301,51 +334,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // Bottom Navigation with BottomAppBar for better FAB integration
           bottomNavigationBar: BottomAppBar(
             shape: const CircularNotchedRectangle(),
-            notchMargin: 8.0,
-            height: 80,
+            notchMargin: 6.0,
+            height: 65, // Reduced from 70 to 65
             elevation: 8,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Home
-                _buildNavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home,
-                  label: 'Home',
-                  index: 0,
-                ),
-                // Leaderboard
-                _buildNavItem(
-                  icon: Icons.leaderboard_outlined,
-                  activeIcon: Icons.leaderboard,
-                  label: 'Leaderboard',
-                  index: 1,
-                ),
-                // Spacer for FAB
-                const SizedBox(width: 80), // Space for the FAB
-                // Progress
-                _buildNavItem(
-                  icon: Icons.trending_up_outlined,
-                  activeIcon: Icons.trending_up,
-                  label: 'Progress',
-                  index: 2,
-                ),
-                // Settings
-                _buildNavItem(
-                  icon: Icons.settings_outlined,
-                  activeIcon: Icons.settings,
-                  label: 'Settings',
-                  index: 3,
-                ),
-              ],
+            child: Container(
+              height: 65, // Reduced from 70 to 65
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0), // Added vertical padding
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Home
+                  _buildNavItem(
+                    icon: Icons.home_outlined,
+                    activeIcon: Icons.home,
+                    label: 'Home',
+                    index: 0,
+                  ),
+                  // Leaderboard
+                  _buildNavItem(
+                    icon: Icons.leaderboard_outlined,
+                    activeIcon: Icons.leaderboard,
+                    label: 'Leaderboard',
+                    index: 1,
+                  ),
+                  // Spacer for FAB
+                  const SizedBox(width: 40), // Reduced from 50 to 40
+                  // Progress
+                  _buildNavItem(
+                    icon: Icons.trending_up_outlined,
+                    activeIcon: Icons.trending_up,
+                    label: 'Progress',
+                    index: 2,
+                  ),
+                  // Settings
+                  _buildNavItem(
+                    icon: Icons.settings_outlined,
+                    activeIcon: Icons.settings,
+                    label: 'Settings',
+                    index: 3,
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       error: (error, stack) => Scaffold(
         body: Center(
-          child: Text('Error loading user data: $error'),
+          child: Text('Error: ${error.toString()}'),
         ),
       ),
     );

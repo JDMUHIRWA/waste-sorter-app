@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_constants.dart';
 
 class DisposalInstructionsScreen extends StatefulWidget {
   final String imagePath;
@@ -72,17 +71,22 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Color _getCategoryColor(String category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     switch (category.toLowerCase()) {
       case 'recyclable':
-        return const Color(0xFF4CAF50);
-      case 'compostable':
-        return const Color(0xFF8BC34A);
-      case 'landfill':
-        return const Color(0xFF757575);
+        return const Color(0xFF4CAF50); // Green
+      case 'compost':
+        return const Color(0xFF8BC34A); // Light Green
       case 'hazardous':
-        return const Color(0xFFF44336);
+        return const Color(0xFFFF5722); // Deep Orange
+      case 'electronic':
+        return const Color(0xFF2196F3); // Blue
+      case 'trash':
+        return const Color(0xFF9E9E9E); // Grey
       default:
-        return AppColors.primary;
+        return colorScheme.primary;
     }
   }
 
@@ -110,22 +114,25 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
-            color: AppColors.textPrimary,
+            color: colorScheme.onSurface,
           ),
         ),
         title: Text(
           _isAnalyzing ? 'Analyzing Item' : 'Disposal Instructions',
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: colorScheme.onSurface,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -137,9 +144,9 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                   onPressed: () {
                     // TODO: Share functionality
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.share,
-                    color: AppColors.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ]
@@ -150,14 +157,19 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildAnalyzingState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageSize = screenWidth * 0.6 > 300 ? 300.0 : screenWidth * 0.6;
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withValues(alpha: 0.1),
-            AppColors.background,
+            colorScheme.primary.withValues(alpha: 0.1),
+            colorScheme.surface,
           ],
         ),
       ),
@@ -170,13 +182,13 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
 
               // Captured Image
               Container(
-                width: 250,
-                height: 250,
+                width: imageSize,
+                height: imageSize,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -200,19 +212,19 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.psychology,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           size: 30,
                         ),
                       ),
@@ -221,27 +233,28 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                         width: 200,
                         child: LinearProgressIndicator(
                           value: _progressController.value,
-                          backgroundColor: Colors.grey[300],
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          backgroundColor:
+                              colorScheme.outline.withValues(alpha: 0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.primary),
                           minHeight: 6,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         '${(_progressController.value * 100).toInt()}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'AI is analyzing your waste item...',
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -261,47 +274,39 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   Widget _buildResultState() {
     final result = _classificationResult!;
     final categoryColor = _getCategoryColor(result['category']);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
+      width: double.infinity,
+      height: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
             categoryColor.withValues(alpha: 0.1),
-            AppColors.background,
+            colorScheme.surface,
           ],
         ),
       ),
       child: SafeArea(
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 1),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: _slideController,
-            curve: Curves.easeOutCubic,
-          )),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Classification Card
-                Container(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+
+              // Classification Card
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
                   child: Column(
                     children: [
                       Container(
@@ -325,13 +330,15 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                           fontWeight: FontWeight.bold,
                           color: categoryColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       Text(
                         result['itemType'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       Container(
@@ -354,183 +361,190 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
                     ],
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-                // Disposal Instructions
-                _buildSection(
-                  'Disposal Instructions',
-                  Icons.assignment_turned_in,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: result['instructions']
-                        .asMap()
-                        .entries
-                        .map<Widget>((entry) {
-                      final index = entry.key;
-                      final instruction = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-                              margin: const EdgeInsets.only(right: 16),
-                              decoration: BoxDecoration(
-                                color: categoryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${index + 1}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                instruction,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Environmental Impact
-                _buildSection(
-                  'Environmental Impact',
-                  Icons.eco,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+              // Disposal Instructions
+              _buildSection(
+                'Disposal Instructions',
+                Icons.assignment_turned_in,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: result['instructions']
+                      .asMap()
+                      .entries
+                      .map<Widget>((entry) {
+                    final index = entry.key;
+                    final instruction = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: _buildImpactMetric(
-                              'CO₂ Saved',
-                              result['environmentalImpact']['co2Saved'],
-                              Icons.cloud_off,
+                          Container(
+                            width: 28,
+                            height: 28,
+                            margin: const EdgeInsets.only(right: 16),
+                            decoration: BoxDecoration(
+                              color: categoryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${index + 1}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 16),
                           Expanded(
-                            child: _buildImpactMetric(
-                              'Energy Saved',
-                              result['environmentalImpact']['energySaved'],
-                              Icons.flash_on,
+                            child: Text(
+                              instruction,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                height: 1.5,
+                                color: colorScheme.onSurface,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        result['environmentalImpact']['description'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 ),
+              ),
 
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-                // Alternative Uses
-                _buildSection(
-                  'Creative Reuse Ideas',
-                  Icons.lightbulb,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: result['alternativeUses']
-                        .map<Widget>((use) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.lightbulb_outline,
-                                    size: 16,
-                                    color: AppColors.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      use,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Action Buttons
-                Row(
+              // Environmental Impact
+              _buildSection(
+                'Environmental Impact',
+                Icons.eco,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.push('/congratulations', extra: {
-                            'category': result['category'],
-                            'points': 5,
-                            'streak': 1,
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: categoryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildImpactMetric(
+                            'CO₂ Saved',
+                            result['environmentalImpact']['co2Saved'],
+                            Icons.cloud_off,
                           ),
                         ),
-                        child: const Text(
-                          'I\'ve Sorted It',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildImpactMetric(
+                            'Energy Saved',
+                            result['environmentalImpact']['energySaved'],
+                            Icons.flash_on,
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      result['environmentalImpact']['description'],
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    OutlinedButton(
-                      onPressed: () => context.pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: categoryColor),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 20),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Alternative Uses
+              _buildSection(
+                'Creative Reuse Ideas',
+                Icons.lightbulb,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: result['alternativeUses']
+                      .map<Widget>((use) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.lightbulb_outline,
+                                  size: 16,
+                                  color: colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    use,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.push('/congratulations', extra: {
+                          'category': result['category'],
+                          'points': 5,
+                          'streak': 1,
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: categoryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Icon(Icons.camera_alt),
+                      child: const Text(
+                        'I\'ve Sorted It',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  const SizedBox(width: 16),
+                  OutlinedButton(
+                    onPressed: () => context.pop(),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: categoryColor),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Icon(Icons.camera_alt),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 32), // Extra bottom padding
+            ],
           ),
         ),
       ),
@@ -538,15 +552,18 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildSection(String title, IconData icon, Widget content) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -557,13 +574,14 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -576,29 +594,32 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildImpactMetric(String label, String value, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.primary, size: 24),
+          Icon(icon, color: colorScheme.primary, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -607,25 +628,28 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
   }
 
   Widget _buildImageWidget() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     if (kIsWeb) {
       // For web, show a placeholder since we can't access the file system
       return Container(
         width: double.infinity,
         height: 250,
-        color: AppColors.primary.withValues(alpha: 0.1),
-        child: const Column(
+        color: colorScheme.primary.withValues(alpha: 0.1),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.image,
               size: 48,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Image Preview',
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -643,20 +667,20 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
             return Container(
               width: double.infinity,
               height: 250,
-              color: AppColors.primary.withValues(alpha: 0.1),
-              child: const Column(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.broken_image,
                     size: 48,
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Failed to load image',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -668,20 +692,20 @@ class _DisposalInstructionsScreenState extends State<DisposalInstructionsScreen>
         return Container(
           width: double.infinity,
           height: 250,
-          color: AppColors.primary.withValues(alpha: 0.1),
-          child: const Column(
+          color: colorScheme.primary.withValues(alpha: 0.1),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.error,
                 size: 48,
-                color: AppColors.primary,
+                color: colorScheme.primary,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 'Image unavailable',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
