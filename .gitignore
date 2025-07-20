@@ -44,3 +44,15 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/.kotlin/
+
+# API Keys and sensitive configuration
+lib/core/config/app_config.dart
+
+# Firebase private keys (if any)
+service-account-*.json
+private-key.json
+
+# Environment files
+.env
+.env.local
+.env.production

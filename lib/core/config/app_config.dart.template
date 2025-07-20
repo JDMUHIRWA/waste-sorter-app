@@ -1,0 +1,28 @@
+// Configuration file template for API keys and environment variables
+// Copy this file to app_config.dart and fill in your actual values
+
+class AppConfig {
+  // Get your RapidAPI key from: https://rapidapi.com/
+  // Subscribe to: https://rapidapi.com/reciclapi/api/garbage-detection
+  static const String rapidApiKey = 'YOUR_RAPID_API_KEY_HERE';
+  
+  // Firebase project configuration (already set up in firebase_options.dart)
+  static const String firebaseProjectId = 'waste-sorter-7f046';
+  
+  // Default user location
+  static const String defaultLocation = 'Kigali';
+  
+  // Points system configuration
+  static const int pointsPerItem = 5;
+  
+  // API endpoints
+  static const String wasteClassificationUrl = 'https://reciclapi-garbage-detection.p.rapidapi.com/predict';
+  
+  // Firestore collection names
+  static const String usersCollection = 'users';
+  static const String scansCollection = 'scans';
+  static const String rulesCollection = 'rules';
+  static const String leaderboardCollection = 'leaderboard';
+  static const String badgesCollection = 'badges';
+  static const String tipsCollection = 'tips';
+}

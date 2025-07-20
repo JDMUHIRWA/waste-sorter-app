@@ -86,7 +86,7 @@ class _ScanScreenState extends State<ScanScreen> {
         // Navigate to disposal instructions with the captured image
         if (mounted) {
           context
-              .push('/disposal-instructions', extra: {'imagePath': image.path});
+              .push('/enhanced-disposal-instructions', extra: {'imagePath': image.path});
         }
       } else {
         setState(() {
@@ -124,7 +124,7 @@ class _ScanScreenState extends State<ScanScreen> {
         // Verify the image exists and has content
         if (await image.length() > 0) {
           if (mounted) {
-            context.push('/disposal-instructions',
+            context.push('/enhanced-disposal-instructions',
                 extra: {'imagePath': image.path});
           }
         } else {

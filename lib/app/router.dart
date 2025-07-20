@@ -8,7 +8,7 @@ import '../features/auth/screens/create_profile_screen.dart';
 import '../features/location/screens/set_location_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/scan/screens/scan_screen.dart';
-import '../features/scan/screens/disposal_instructions_screen.dart';
+import '../features/scan/screens/enhanced_disposal_instructions_screen.dart';
 import '../features/scan/screens/confirmation_screen.dart';
 import '../features/scan/screens/congratulations_screen.dart';
 import '../features/leaderboard/screens/leaderboard_screen.dart';
@@ -53,7 +53,7 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ScanScreen(),
     ),
     GoRoute(
-      path: '/disposal-instructions',
+      path: '/enhanced-disposal-instructions',
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
         final imagePath = extra?['imagePath'] as String?;
@@ -62,7 +62,7 @@ final GoRouter appRouter = GoRouter(
             body: Center(child: Text('Image path not provided')),
           );
         }
-        return DisposalInstructionsScreen(imagePath: imagePath);
+        return EnhancedDisposalInstructionsScreen(imagePath: imagePath);
       },
     ),
     GoRoute(

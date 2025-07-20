@@ -11,6 +11,9 @@ class AuthService {
   Future<void> signUpWithEmail({
     required String email,
     required String password,
+    String? name,
+    String? role,
+    String? location,
   }) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -23,6 +26,12 @@ class AuthService {
         final userModel = UserModel(
           uid: user.uid,
           email: user.email!,
+          name: name,
+          role: role,
+          location: location ?? 'Kigali', // Default to Kigali
+          streakCount: 0,
+          totalPoints: 0,
+          createdAt: DateTime.now(),
         );
         await _firestore
             .collection('users')
