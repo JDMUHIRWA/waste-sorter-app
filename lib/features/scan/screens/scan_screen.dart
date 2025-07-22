@@ -41,12 +41,25 @@ class _ScanScreenState extends State<ScanScreen> {
 
       _cameras = await availableCameras();
       if (_cameras!.isNotEmpty) {
+        // Use the back camera (usually index 0) for better scanning
+        final backCamera = _cameras!.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.back,
+          orElse: () => _cameras![0],
+        );
+        
         _cameraController = CameraController(
-          _cameras![0],
+          backCamera,
           ResolutionPreset.high,
           enableAudio: false,
+          imageFormatGroup: ImageFormatGroup.jpeg, // Better compatibility
         );
+        
         await _cameraController!.initialize();
+        
+        // Set exposure and focus modes for better scanning
+        await _cameraController!.setExposureMode(ExposureMode.auto);
+        await _cameraController!.setFocusMode(FocusMode.auto);
+        
         if (mounted) {
           setState(() {
             _isCameraInitialized = true;
@@ -160,19 +173,34 @@ class _ScanScreenState extends State<ScanScreen> {
           // Camera Preview
           if (_isCameraInitialized && _cameraController != null)
             Positioned.fill(
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.center,
-                  child: FittedBox(
-                    fit: BoxFit.fitWidth,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenRatio = constraints.maxWidth / constraints.maxHeight;
+                  final cameraRatio = _cameraController!.value.aspectRatio;
+                  
+                  // Calculate the optimal size to fill the screen without distortion
+                  double previewWidth, previewHeight;
+                  
+                  if (screenRatio > cameraRatio) {
+                    // Screen is wider than camera - fit height and crop width
+                    previewHeight = constraints.maxHeight;
+                    previewWidth = previewHeight * cameraRatio;
+                  } else {
+                    // Screen is taller than camera - fit width and crop height
+                    previewWidth = constraints.maxWidth;
+                    previewHeight = previewWidth / cameraRatio;
+                  }
+                  
+                  return Center(
                     child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width /
-                          (_cameraController!.value.aspectRatio),
-                      child: CameraPreview(_cameraController!),
+                      width: previewWidth,
+                      height: previewHeight,
+                      child: ClipRect(
+                        child: CameraPreview(_cameraController!),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             )
           else if (_error != null)

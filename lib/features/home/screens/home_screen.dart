@@ -81,8 +81,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: () => _onBottomNavTap(index),
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          constraints: const BoxConstraints(maxHeight: 65), // Add height constraint
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2), // Reduced padding
+          constraints:
+              const BoxConstraints(maxHeight: 65), // Add height constraint
+          padding: const EdgeInsets.symmetric(
+              vertical: 6, horizontal: 2), // Reduced padding
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -339,7 +341,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             elevation: 8,
             child: Container(
               height: 65, // Reduced from 70 to 65
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0), // Added vertical padding
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0, vertical: 2.0), // Added vertical padding
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
