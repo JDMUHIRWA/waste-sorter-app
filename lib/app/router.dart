@@ -8,6 +8,7 @@ import '../features/auth/screens/create_profile_screen.dart';
 import '../features/location/screens/set_location_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/scan/screens/scan_screen.dart';
+import '../features/scan/screens/scan_results_screen.dart';
 import '../features/scan/screens/disposal_instructions_screen.dart';
 import '../features/scan/screens/confirmation_screen.dart';
 import '../features/scan/screens/congratulations_screen.dart';
@@ -51,6 +52,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/scan',
       builder: (context, state) => const ScanScreen(),
+    ),
+    GoRoute(
+      path: '/scan-results',
+      builder: (context, state) => const ScanResultsScreen(),
     ),
     GoRoute(
       path: '/disposal-instructions',
