@@ -4,27 +4,29 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../providers/app_providers.dart';
 
-class ScanScreen extends ConsumerStatefulWidget {
-  const ScanScreen({super.key});
+class EnhancedScanScreen extends ConsumerStatefulWidget {
+  const EnhancedScanScreen({super.key});
 
   @override
-  ConsumerState<ScanScreen> createState() => _ScanScreenState();
+  ConsumerState<EnhancedScanScreen> createState() => _EnhancedScanScreenState();
 }
 
-class _ScanScreenState extends ConsumerState<ScanScreen> {
+class _EnhancedScanScreenState extends ConsumerState<EnhancedScanScreen> {
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
-  bool _isLoading = false;
   String? _error;
   final ImagePicker _imagePicker = ImagePicker();
+  String _currentLocation = 'Kigali'; // Default location
 
   @override
   void initState() {
     super.initState();
     _initializeCamera();
+    _getCurrentLocation();
   }
 
   Future<void> _initializeCamera() async {
@@ -43,25 +45,22 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
       _cameras = await availableCameras();
       if (_cameras!.isNotEmpty) {
-        // Use the back camera (usually index 0) for better scanning
         final backCamera = _cameras!.firstWhere(
           (camera) => camera.lensDirection == CameraLensDirection.back,
           orElse: () => _cameras![0],
         );
-
+        
         _cameraController = CameraController(
           backCamera,
           ResolutionPreset.high,
           enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.jpeg, // Better compatibility
+          imageFormatGroup: ImageFormatGroup.jpeg,
         );
-
+        
         await _cameraController!.initialize();
-
-        // Set exposure and focus modes for better scanning
         await _cameraController!.setExposureMode(ExposureMode.auto);
         await _cameraController!.setFocusMode(FocusMode.auto);
-
+        
         if (mounted) {
           setState(() {
             _isCameraInitialized = true;
@@ -79,6 +78,28 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     }
   }
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        final requested = await Geolocator.requestPermission();
+        if (requested == LocationPermission.denied) {
+          return; // Use default location
+        }
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      // In a real app, you'd reverse geocode this to get city name
+      // For now, we'll use the default
+      setState(() {
+        _currentLocation = 'Kigali';
+      });
+    } catch (e) {
+      // Use default location if GPS fails
+      print('Location error: $e');
+    }
+  }
+
   Future<void> _captureImage() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       setState(() {
@@ -87,17 +108,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
     try {
       final XFile image = await _cameraController!.takePicture();
 
-      // Verify the image was captured successfully
       if (await image.length() > 0) {
-        // Process the captured image through our backend
         await _processCapturedImage(image.path);
       } else {
         setState(() {
@@ -108,21 +122,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       setState(() {
         _error = 'Failed to capture image: ${e.toString()}';
       });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 
   Future<void> _pickImageFromGallery() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -131,28 +134,133 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         maxHeight: 1080,
       );
 
-      if (image != null) {
-        // Verify the image exists and has content
-        if (await image.length() > 0) {
-          // Process the selected image through our backend
-          await _processCapturedImage(image.path);
-        } else {
-          setState(() {
-            _error = 'Selected image is empty. Please choose another image.';
-          });
-        }
+      if (image != null && await image.length() > 0) {
+        await _processCapturedImage(image.path);
+      } else if (image != null) {
+        setState(() {
+          _error = 'Selected image is empty. Please choose another image.';
+        });
       }
     } catch (e) {
       setState(() {
         _error = 'Failed to pick image: ${e.toString()}';
       });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
+  }
+
+  Future<void> _processCapturedImage(String imagePath) async {
+    // Reset any previous scan processing state
+    ref.read(scanProcessingProvider.notifier).reset();
+    
+    // Navigate to results screen first
+    if (mounted) {
+      context.push('/scan-results');
+      
+      // Start processing the scan after navigation
+      await ref.read(scanProcessingProvider.notifier).processScan(imagePath, _currentLocation);
+    }
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCornerIndicator(Alignment alignment) {
+    return Positioned(
+      top: alignment == Alignment.topLeft || alignment == Alignment.topRight ? -1 : null,
+      bottom: alignment == Alignment.bottomLeft || alignment == Alignment.bottomRight ? -1 : null,
+      left: alignment == Alignment.topLeft || alignment == Alignment.bottomLeft ? -1 : null,
+      right: alignment == Alignment.topRight || alignment == Alignment.bottomRight ? -1 : null,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          border: Border(
+            top: alignment == Alignment.topLeft || alignment == Alignment.topRight
+                ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 3)
+                : BorderSide.none,
+            bottom: alignment == Alignment.bottomLeft || alignment == Alignment.bottomRight
+                ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 3)
+                : BorderSide.none,
+            left: alignment == Alignment.topLeft || alignment == Alignment.bottomLeft
+                ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 3)
+                : BorderSide.none,
+            right: alignment == Alignment.topRight || alignment == Alignment.bottomRight
+                ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 3)
+                : BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProcessingOverlay(ScanProcessingState state) {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.8),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  state.message ?? 'Processing...',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: state.progress,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${(state.progress * 100).toInt()}%',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -161,29 +269,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     super.dispose();
   }
 
-  Future<void> _processCapturedImage(String imagePath) async {
-    try {
-      // Reset any previous scan processing state
-      ref.read(scanProcessingProvider.notifier).reset();
-
-      // Navigate to results screen to show processing
-      if (mounted) {
-        context.push('/scan-results');
-
-        // Start processing the scan after navigation
-        await ref
-            .read(scanProcessingProvider.notifier)
-            .processScan(imagePath, 'Kigali');
-      }
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to process scan: $e';
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final scanProcessingState = ref.watch(scanProcessingProvider);
+    
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -193,23 +282,19 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             Positioned.fill(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final screenRatio =
-                      constraints.maxWidth / constraints.maxHeight;
+                  final screenRatio = constraints.maxWidth / constraints.maxHeight;
                   final cameraRatio = _cameraController!.value.aspectRatio;
-
-                  // Calculate the optimal size to fill the screen without distortion
+                  
                   double previewWidth, previewHeight;
-
+                  
                   if (screenRatio > cameraRatio) {
-                    // Screen is wider than camera - fit height and crop width
                     previewHeight = constraints.maxHeight;
                     previewWidth = previewHeight * cameraRatio;
                   } else {
-                    // Screen is taller than camera - fit width and crop height
                     previewWidth = constraints.maxWidth;
                     previewHeight = previewWidth / cameraRatio;
                   }
-
+                  
                   return Center(
                     child: SizedBox(
                       width: previewWidth,
@@ -226,6 +311,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             _buildErrorState()
           else
             _buildLoadingState(),
+
+          // Processing Overlay
+          if (scanProcessingState.isProcessing)
+            _buildProcessingOverlay(scanProcessingState),
 
           // Top Bar
           Positioned(
@@ -266,7 +355,26 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 48), // Balance the back button
+                    // Location indicator
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.location_on, color: Colors.white, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            _currentLocation,
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                   ],
                 ),
               ),
@@ -312,35 +420,19 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           // Gallery Button
-                          GestureDetector(
-                            onTap: _isLoading ? null : _pickImageFromGallery,
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.photo_library,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
+                          _buildControlButton(
+                            icon: Icons.photo_library,
+                            onTap: scanProcessingState.isProcessing ? null : _pickImageFromGallery,
                           ),
 
                           // Capture Button
                           GestureDetector(
-                            onTap: _isLoading ? null : _captureImage,
+                            onTap: scanProcessingState.isProcessing ? null : _captureImage,
                             child: Container(
                               width: 80,
                               height: 80,
                               decoration: BoxDecoration(
-                                color: _isLoading
+                                color: scanProcessingState.isProcessing
                                     ? Colors.grey.withValues(alpha: 0.5)
                                     : Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.circle,
@@ -359,7 +451,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                                   ),
                                 ],
                               ),
-                              child: _isLoading
+                              child: scanProcessingState.isProcessing
                                   ? const CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 3,
@@ -372,28 +464,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                             ),
                           ),
 
-                          // Flash Toggle (placeholder for now)
-                          GestureDetector(
+                          // Flash Toggle
+                          _buildControlButton(
+                            icon: Icons.flash_off,
                             onTap: () {
                               // TODO: Implement flash toggle
                             },
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.flash_off,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -421,78 +497,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                   child: Stack(
                     children: [
                       // Corner indicators
-                      Positioned(
-                        top: -1,
-                        left: -1,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                              left: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -1,
-                        right: -1,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                              right: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: -1,
-                        left: -1,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                              left: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: -1,
-                        right: -1,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                              right: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 3),
-                            ),
-                          ),
-                        ),
-                      ),
+                      _buildCornerIndicator(Alignment.topLeft),
+                      _buildCornerIndicator(Alignment.topRight),
+                      _buildCornerIndicator(Alignment.bottomLeft),
+                      _buildCornerIndicator(Alignment.bottomRight),
                     ],
                   ),
                 ),
