@@ -38,7 +38,7 @@ class ScanService {
 
       // 2. Classify the waste using the AI API
       final classification =
-          await WasteClassificationService.classifyWaste(imagePath);
+          await WasteClassificationService.classifyWaste(imageUrl);
 
       // 3. Calculate points earned
       final pointsEarned =

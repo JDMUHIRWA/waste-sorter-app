@@ -1,19 +1,22 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/scan_models.dart';
 import 'firebase_storage_service.dart';
 
 class WasteClassificationService {
-  static const String _baseUrl = 'https://reciclapi-garbage-detection.p.rapidapi.com';
-  static const String _rapidApiKey = 'YOUR_RAPID_API_KEY'; // Replace with your actual API key
-  static const String _rapidApiHost = 'reciclapi-garbage-detection.p.rapidapi.com';
+  static const String _baseUrl =
+      'https://reciclapi-garbage-detection.p.rapidapi.com';
+  // Never push the API key since our repository is public.
+  static const String _rapidApiKey =
+      'YOUR_RAPID_API_KEY'; // Replace with your actual API key
+  static const String _rapidApiHost =
+      'reciclapi-garbage-detection.p.rapidapi.com';
 
   // Map API response to our local bin color rules
   static const Map<String, String> _categoryToBinColor = {
     'plastic': 'Blue',
-    'paper': 'Yellow', 
+    'paper': 'Yellow',
     'organic': 'Green',
     'metal': 'Blue',
     'glass': 'Blue',
@@ -76,59 +79,61 @@ class WasteClassificationService {
   static Future<String> _uploadImageTemporarily(String imagePath) async {
     try {
       // Try to use Firebase Storage for production
-      final storageService = FirebaseStorageService();
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
-        return await FirebaseStorageService.uploadScanImage(currentUser.uid, imagePath);
+        return await FirebaseStorageService.uploadScanImage(
+            currentUser.uid, imagePath);
       }
     } catch (e) {
       print('Failed to upload to Firebase Storage: $e');
     }
-    
+
     // Fallback: use local file path for demo
     return 'file://$imagePath';
   }
 
   /// Classify waste using the RapidAPI service
-  static Future<WasteClassificationResult> classifyWaste(String imagePath) async {
+  static Future<WasteClassificationResult> classifyWaste(
+      String imagePath) async {
     print('Starting waste classification for image: $imagePath');
-    
+
     try {
-      // For now, always use mock classification since we don't have a real API key
-      // In production, uncomment the API call below
-      
+      // Check if we have a valid API key
+      if (_rapidApiKey == 'YOUR_RAPID_API_KEY') {
+        print('Using mock classification - API key not configured');
+        return _getMockClassification();
+      }
+
       // Upload image and get public URL
-      // final imageUrl = await _uploadImageTemporarily(imagePath);
-      // 
-      // // Prepare request to RapidAPI
-      // final headers = {
-      //   'Content-Type': 'application/json',
-      //   'x-rapidapi-host': _rapidApiHost,
-      //   'x-rapidapi-key': _rapidApiKey,
-      // };
-      //
-      // final body = json.encode({
-      //   'image': imageUrl,
-      // });
-      //
-      // // Make API request
-      // final response = await http.post(
-      //   Uri.parse('$_baseUrl/predict'),
-      //   headers: headers,
-      //   body: body,
-      // );
-      //
-      // if (response.statusCode == 200) {
-      //   final jsonResponse = json.decode(response.body);
-      //   return _parseApiResponse(jsonResponse);
-      // } else {
-      //   throw Exception('API request failed with status: ${response.statusCode}');
-      // }
-      
-      // For demo purposes, return mock classification
-      print('Using mock classification for demo');
-      return _getMockClassification();
-      
+      final imageUrl = await _uploadImageTemporarily(imagePath);
+
+      // Prepare request to RapidAPI
+      final headers = {
+        'Content-Type': 'application/json',
+        'x-rapidapi-host': _rapidApiHost,
+        'x-rapidapi-key': _rapidApiKey,
+      };
+
+      final body = json.encode({
+        'image': imageUrl,
+      });
+
+      // Make API request
+      final response = await http.post(
+        Uri.parse('$_baseUrl/predict'),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return _parseApiResponse(jsonResponse);
+      } else {
+        print('API request failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception(
+            'API request failed with status: ${response.statusCode}');
+      }
     } catch (e) {
       print('Classification error: $e');
       // Fallback to mock classification for demo
@@ -137,32 +142,40 @@ class WasteClassificationService {
   }
 
   /// Parse the API response into our classification result
-  static WasteClassificationResult _parseApiResponse(Map<String, dynamic> response) {
-    // Parse the API response structure - adjust based on actual API response format
-    final predictions = response['predictions'] as List<dynamic>? ?? [];
-    
+  static WasteClassificationResult _parseApiResponse(dynamic response) {
+    // Handle the actual API response format which is a direct array
+    List<dynamic> predictions;
+
+    if (response is List) {
+      predictions = response;
+    } else if (response is Map && response.containsKey('predictions')) {
+      predictions = response['predictions'] as List<dynamic>? ?? [];
+    } else {
+      predictions = [];
+    }
+
     List<String> detectedItems = [];
     List<String> categories = [];
     double maxConfidence = 0.0;
     String primaryCategory = 'general';
 
     for (var prediction in predictions) {
-      final item = prediction['label'] as String? ?? '';
+      final className = prediction['class'] as String? ?? '';
       final confidence = (prediction['confidence'] as num?)?.toDouble() ?? 0.0;
-      
-      if (item.isNotEmpty) {
-        detectedItems.add(item);
-        
-        // Map item to category
-        String category = _mapItemToCategory(item);
-        if (!categories.contains(category)) {
-          categories.add(category);
+
+      if (className.isNotEmpty) {
+        // Use the class name directly as the detected item
+        detectedItems.add(_formatClassName(className));
+
+        // The class name is already a category
+        if (!categories.contains(className)) {
+          categories.add(className);
         }
-        
+
         // Track highest confidence prediction
         if (confidence > maxConfidence) {
           maxConfidence = confidence;
-          primaryCategory = category;
+          primaryCategory = className;
         }
       }
     }
@@ -175,7 +188,8 @@ class WasteClassificationService {
     }
 
     final binColor = _categoryToBinColor[primaryCategory] ?? 'Grey';
-    final instructions = _categoryInstructions[primaryCategory] ?? ['Dispose according to local guidelines'];
+    final instructions = _categoryInstructions[primaryCategory] ??
+        ['Dispose according to local guidelines'];
 
     return WasteClassificationResult(
       detectedItems: detectedItems,
@@ -187,31 +201,30 @@ class WasteClassificationService {
     );
   }
 
-  /// Map detected item name to waste category
-  static String _mapItemToCategory(String item) {
-    final itemLower = item.toLowerCase();
-    
-    if (itemLower.contains('bottle') || itemLower.contains('plastic') || itemLower.contains('container')) {
-      return 'plastic';
-    } else if (itemLower.contains('paper') || itemLower.contains('document') || itemLower.contains('newspaper')) {
-      return 'paper';
-    } else if (itemLower.contains('food') || itemLower.contains('organic') || itemLower.contains('fruit') || itemLower.contains('vegetable')) {
-      return 'organic';
-    } else if (itemLower.contains('can') || itemLower.contains('metal') || itemLower.contains('aluminum')) {
-      return 'metal';
-    } else if (itemLower.contains('glass') || itemLower.contains('jar')) {
-      return 'glass';
-    } else if (itemLower.contains('cardboard') || itemLower.contains('box')) {
-      return 'cardboard';
-    } else if (itemLower.contains('electronic') || itemLower.contains('phone') || itemLower.contains('computer')) {
-      return 'electronics';
-    } else if (itemLower.contains('battery')) {
-      return 'battery';
-    } else if (itemLower.contains('chemical') || itemLower.contains('paint') || itemLower.contains('hazardous')) {
-      return 'hazardous';
+  /// Format class name for display
+  static String _formatClassName(String className) {
+    switch (className.toLowerCase()) {
+      case 'plastic':
+        return 'Plastic Item';
+      case 'metal':
+        return 'Metal Item';
+      case 'cardboard':
+        return 'Cardboard';
+      case 'paper':
+        return 'Paper';
+      case 'glass':
+        return 'Glass Item';
+      case 'organic':
+        return 'Organic Waste';
+      case 'electronics':
+        return 'Electronic Device';
+      case 'battery':
+        return 'Battery';
+      case 'hazardous':
+        return 'Hazardous Material';
+      default:
+        return className.substring(0, 1).toUpperCase() + className.substring(1);
     }
-    
-    return 'general';
   }
 
   /// Get recommended action based on category
@@ -240,27 +253,23 @@ class WasteClassificationService {
 
   /// Mock classification for testing/demo purposes
   static WasteClassificationResult _getMockClassification() {
-    // Return a mock result for testing
-    return WasteClassificationResult(
-      detectedItems: ['Plastic Bottle'],
-      categories: ['plastic'],
-      binColor: 'Blue',
-      instructions: [
-        'Remove cap and lid',
-        'Rinse thoroughly',
-        'Check recycling number',
-        'Place in blue recycling bin'
-      ],
-      confidence: 0.85,
-      recommendedAction: 'Clean and recycle in blue bin',
-    );
+    // Simulate the API response format with multiple detections
+    final mockApiResponse = [
+      {"class": "plastic", "confidence": 0.8},
+      {"class": "metal", "confidence": 0.7},
+      {"class": "cardboard", "confidence": 0.6},
+      {"class": "paper", "confidence": 0.5}
+    ];
+
+    // Use the same parsing logic as the real API
+    return _parseApiResponse(mockApiResponse);
   }
 
   /// Calculate points based on classification result
   static int calculatePoints(WasteClassificationResult classification) {
     // Base points for scanning
     int points = 5;
-    
+
     // Bonus points based on category
     for (String category in classification.categories) {
       switch (category) {
@@ -280,12 +289,12 @@ class WasteClassificationService {
           break;
       }
     }
-    
+
     // Confidence bonus
     if (classification.confidence > 0.8) {
       points += 2;
     }
-    
+
     return points;
   }
 }
