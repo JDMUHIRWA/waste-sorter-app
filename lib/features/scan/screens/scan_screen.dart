@@ -51,9 +51,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
         _cameraController = CameraController(
           backCamera,
-          ResolutionPreset.high,
+          ResolutionPreset.medium, // Reduced from high to prevent buffer issues
           enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.jpeg, // Better compatibility
+          imageFormatGroup: ImageFormatGroup.jpeg,
         );
 
         await _cameraController!.initialize();
@@ -61,6 +61,14 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         // Set exposure and focus modes for better scanning
         await _cameraController!.setExposureMode(ExposureMode.auto);
         await _cameraController!.setFocusMode(FocusMode.auto);
+
+        // Set flash mode to auto for better indoor scanning
+        try {
+          await _cameraController!.setFlashMode(FlashMode.auto);
+        } catch (e) {
+          // Flash might not be available on all devices
+          print('Flash not available: $e');
+        }
 
         if (mounted) {
           setState(() {
@@ -87,12 +95,18 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       return;
     }
 
+    // Prevent multiple rapid captures
+    if (_isLoading) return;
+
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
     try {
+      // Add a small delay to ensure camera is ready
+      await Future.delayed(const Duration(milliseconds: 100));
+
       final XFile image = await _cameraController!.takePicture();
 
       // Verify the image was captured successfully
