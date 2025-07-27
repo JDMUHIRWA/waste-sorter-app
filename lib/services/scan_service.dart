@@ -22,14 +22,27 @@ class ScanService {
     }
 
     try {
-      // 1. Upload image to Firebase Storage
-      final imageUrl = await FirebaseStorageService.uploadScanImage(user.uid, imagePath);
+      String imageUrl;
+
+      // 1. Try to upload image to Firebase Storage, fallback to local path if it fails
+      try {
+        imageUrl =
+            await FirebaseStorageService.uploadScanImage(user.uid, imagePath);
+      } catch (storageError) {
+        // For now, use a placeholder URL if Firebase Storage is not configured
+        // In production, this should be properly configured
+        print('Warning: Firebase Storage upload failed: $storageError');
+        imageUrl =
+            'placeholder://local-image-${DateTime.now().millisecondsSinceEpoch}';
+      }
 
       // 2. Classify the waste using the AI API
-      final classification = await WasteClassificationService.classifyWaste(imagePath);
+      final classification =
+          await WasteClassificationService.classifyWaste(imagePath);
 
       // 3. Calculate points earned
-      final pointsEarned = WasteClassificationService.calculatePoints(classification);
+      final pointsEarned =
+          WasteClassificationService.calculatePoints(classification);
 
       // 4. Create scan result
       final scanResult = ScanResultModel(
@@ -70,10 +83,10 @@ class ScanService {
   /// Update user statistics after a scan
   static Future<void> _updateUserStats(String userId, int pointsEarned) async {
     final userRef = _firestore.collection('users').doc(userId);
-    
+
     await _firestore.runTransaction((transaction) async {
       final userDoc = await transaction.get(userRef);
-      
+
       if (!userDoc.exists) {
         throw Exception('User document not found');
       }
@@ -85,16 +98,16 @@ class ScanService {
       int newStreak = user.streakCount;
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      
+
       if (user.lastScanDate != null) {
         final lastScanDay = DateTime(
           user.lastScanDate!.year,
           user.lastScanDate!.month,
           user.lastScanDate!.day,
         );
-        
+
         final daysDifference = today.difference(lastScanDay).inDays;
-        
+
         if (daysDifference == 1) {
           // Consecutive day - increment streak
           newStreak++;
@@ -120,27 +133,33 @@ class ScanService {
   }
 
   /// Update leaderboard entries
-  static Future<void> _updateLeaderboards(String userId, int pointsEarned) async {
+  static Future<void> _updateLeaderboards(
+      String userId, int pointsEarned) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final thisWeek = _getWeekStart(now);
-    
+
     // Update daily leaderboard
-    final dailyLeaderboardId = 'daily-${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-    await _updateLeaderboardEntry('leaderboard', dailyLeaderboardId, userId, pointsEarned);
+    final dailyLeaderboardId =
+        'daily-${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    await _updateLeaderboardEntry(
+        'leaderboard', dailyLeaderboardId, userId, pointsEarned);
 
     // Update weekly leaderboard
-    final weeklyLeaderboardId = 'weekly-${thisWeek.year}-${thisWeek.month.toString().padLeft(2, '0')}-${thisWeek.day.toString().padLeft(2, '0')}';
-    await _updateLeaderboardEntry('leaderboard', weeklyLeaderboardId, userId, pointsEarned);
+    final weeklyLeaderboardId =
+        'weekly-${thisWeek.year}-${thisWeek.month.toString().padLeft(2, '0')}-${thisWeek.day.toString().padLeft(2, '0')}';
+    await _updateLeaderboardEntry(
+        'leaderboard', weeklyLeaderboardId, userId, pointsEarned);
   }
 
   /// Update a specific leaderboard entry
-  static Future<void> _updateLeaderboardEntry(String collection, String docId, String userId, int points) async {
+  static Future<void> _updateLeaderboardEntry(
+      String collection, String docId, String userId, int points) async {
     final leaderboardRef = _firestore.collection(collection).doc(docId);
-    
+
     await _firestore.runTransaction((transaction) async {
       final doc = await transaction.get(leaderboardRef);
-      
+
       Map<String, dynamic> data;
       if (doc.exists) {
         data = doc.data()!;
@@ -149,18 +168,20 @@ class ScanService {
       }
 
       List<dynamic> topUsers = List.from(data['topUsers'] ?? []);
-      
+
       // Find existing user entry
-      int existingIndex = topUsers.indexWhere((user) => user['userID'] == userId);
-      
+      int existingIndex =
+          topUsers.indexWhere((user) => user['userID'] == userId);
+
       if (existingIndex >= 0) {
         // Update existing entry
-        topUsers[existingIndex]['points'] = (topUsers[existingIndex]['points'] as int) + points;
+        topUsers[existingIndex]['points'] =
+            (topUsers[existingIndex]['points'] as int) + points;
       } else {
         // Get user name for new entry
         final userDoc = await _firestore.collection('users').doc(userId).get();
         final userName = userDoc.data()?['name'] ?? 'Anonymous';
-        
+
         // Add new entry
         topUsers.add({
           'userID': userId,
@@ -170,12 +191,14 @@ class ScanService {
       }
 
       // Sort by points (descending) and keep top 100
-      topUsers.sort((a, b) => (b['points'] as int).compareTo(a['points'] as int));
+      topUsers
+          .sort((a, b) => (b['points'] as int).compareTo(a['points'] as int));
       if (topUsers.length > 100) {
         topUsers = topUsers.take(100).toList();
       }
 
-      transaction.set(leaderboardRef, {'topUsers': topUsers}, SetOptions(merge: true));
+      transaction.set(
+          leaderboardRef, {'topUsers': topUsers}, SetOptions(merge: true));
     });
   }
 
@@ -186,7 +209,7 @@ class ScanService {
 
     final user = EnhancedUserModel.fromJson(userDoc.data()!);
     final scanCount = await _getUserScanCount(userId);
-    
+
     final badgesToAward = <BadgeModel>[];
 
     // First scan badge
@@ -280,26 +303,28 @@ class ScanService {
   }
 
   /// Award badges to user
-  static Future<void> _awardBadges(String userId, List<BadgeModel> badges) async {
+  static Future<void> _awardBadges(
+      String userId, List<BadgeModel> badges) async {
     final badgesRef = _firestore.collection('badges').doc(userId);
-    
+
     await _firestore.runTransaction((transaction) async {
       final doc = await transaction.get(badgesRef);
-      
+
       List<dynamic> existingBadges = [];
       if (doc.exists) {
         existingBadges = List.from(doc.data()?['badgeList'] ?? []);
       }
 
       final existingBadgeIds = existingBadges.map((b) => b['badgeId']).toSet();
-      
+
       for (var badge in badges) {
         if (!existingBadgeIds.contains(badge.badgeId)) {
           existingBadges.add(badge.toJson());
         }
       }
 
-      transaction.set(badgesRef, {'badgeList': existingBadges}, SetOptions(merge: true));
+      transaction.set(
+          badgesRef, {'badgeList': existingBadges}, SetOptions(merge: true));
     });
   }
 
@@ -309,12 +334,13 @@ class ScanService {
         .collection('scans')
         .where('userId', isEqualTo: userId)
         .get();
-    
+
     return scansQuery.docs.length;
   }
 
   /// Get scan history for a user
-  static Future<List<ScanResultModel>> getUserScanHistory(String userId, {int limit = 20, int offset = 0}) async {
+  static Future<List<ScanResultModel>> getUserScanHistory(String userId,
+      {int limit = 20, int offset = 0}) async {
     final query = await _firestore
         .collection('scans')
         .where('userId', isEqualTo: userId)
@@ -322,7 +348,9 @@ class ScanService {
         .limit(limit)
         .get();
 
-    return query.docs.map((doc) => ScanResultModel.fromJson(doc.data())).toList();
+    return query.docs
+        .map((doc) => ScanResultModel.fromJson(doc.data()))
+        .toList();
   }
 
   /// Get leaderboard data
@@ -333,20 +361,22 @@ class ScanService {
   }) async {
     date ??= DateTime.now();
     String docId;
-    
+
     if (type == 'daily') {
-      docId = 'daily-${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      docId =
+          'daily-${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     } else {
       final weekStart = _getWeekStart(date);
-      docId = 'weekly-${weekStart.year}-${weekStart.month.toString().padLeft(2, '0')}-${weekStart.day.toString().padLeft(2, '0')}';
+      docId =
+          'weekly-${weekStart.year}-${weekStart.month.toString().padLeft(2, '0')}-${weekStart.day.toString().padLeft(2, '0')}';
     }
 
     final doc = await _firestore.collection('leaderboard').doc(docId).get();
-    
+
     if (!doc.exists) return [];
 
     final topUsers = List.from(doc.data()?['topUsers'] ?? []);
-    
+
     return topUsers.take(limit).map((userData) {
       return LeaderboardEntry(
         userId: userData['userID'],
@@ -358,15 +388,17 @@ class ScanService {
   }
 
   /// Get user's rank in leaderboard
-  static Future<int?> getUserRank(String userId, String type, {DateTime? date}) async {
-    final leaderboard = await getLeaderboard(type: type, date: date, limit: 1000);
-    
+  static Future<int?> getUserRank(String userId, String type,
+      {DateTime? date}) async {
+    final leaderboard =
+        await getLeaderboard(type: type, date: date, limit: 1000);
+
     for (int i = 0; i < leaderboard.length; i++) {
       if (leaderboard[i].userId == userId) {
         return i + 1;
       }
     }
-    
+
     return null;
   }
 
@@ -384,18 +416,21 @@ class ScanService {
   /// Get user badges
   static Future<List<BadgeModel>> getUserBadges(String userId) async {
     final doc = await _firestore.collection('badges').doc(userId).get();
-    
+
     if (!doc.exists) return [];
 
     final badgeList = List.from(doc.data()?['badgeList'] ?? []);
-    
-    return badgeList.map((badgeData) => BadgeModel.fromJson(badgeData)).toList();
+
+    return badgeList
+        .map((badgeData) => BadgeModel.fromJson(badgeData))
+        .toList();
   }
 
   /// Helper function to get start of week (Monday)
   static DateTime _getWeekStart(DateTime date) {
     final daysFromMonday = date.weekday - 1;
-    return DateTime(date.year, date.month, date.day).subtract(Duration(days: daysFromMonday));
+    return DateTime(date.year, date.month, date.day)
+        .subtract(Duration(days: daysFromMonday));
   }
 
   /// Update user location
@@ -408,8 +443,9 @@ class ScanService {
   /// Get disposal rules for a city
   static Future<Map<String, String>> getDisposalRules(String city) async {
     try {
-      final doc = await _firestore.collection('rules').doc(city.toLowerCase()).get();
-      
+      final doc =
+          await _firestore.collection('rules').doc(city.toLowerCase()).get();
+
       if (doc.exists) {
         final data = doc.data()!;
         return Map<String, String>.from(data);
@@ -417,7 +453,7 @@ class ScanService {
     } catch (e) {
       print('Error fetching disposal rules: $e');
     }
-    
+
     // Default rules for Kigali
     return {
       'plastic': 'Blue',
@@ -441,21 +477,24 @@ class ScanService {
       TipModel(
         tipId: 'tip-1',
         title: 'What Belongs in the Blue Bin?',
-        content: 'Plastic bottles, containers, metal cans, and glass jars go in the blue recycling bin. Always rinse them first!',
+        content:
+            'Plastic bottles, containers, metal cans, and glass jars go in the blue recycling bin. Always rinse them first!',
         imageUrl: null,
         postedAt: DateTime.now(),
       ),
       TipModel(
         tipId: 'tip-2',
         title: 'Composting at Home',
-        content: 'Fruit peels, vegetable scraps, and coffee grounds make great compost. Avoid meat, dairy, and oils in your compost bin.',
+        content:
+            'Fruit peels, vegetable scraps, and coffee grounds make great compost. Avoid meat, dairy, and oils in your compost bin.',
         imageUrl: null,
         postedAt: DateTime.now().subtract(const Duration(days: 1)),
       ),
       TipModel(
         tipId: 'tip-3',
         title: 'E-Waste Safety',
-        content: 'Never throw electronics in regular bins. Take them to designated e-waste collection points to prevent environmental damage.',
+        content:
+            'Never throw electronics in regular bins. Take them to designated e-waste collection points to prevent environmental damage.',
         imageUrl: null,
         postedAt: DateTime.now().subtract(const Duration(days: 2)),
       ),
