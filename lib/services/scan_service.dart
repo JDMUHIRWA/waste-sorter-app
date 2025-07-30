@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:uuid/uuid.dart';
+import 'package:waste_sorter_app/services/logging_service.dart';
 import '../models/enhanced_user_model.dart';
 import '../models/scan_models.dart';
 import 'firebase_storage_service.dart';
@@ -31,7 +33,7 @@ class ScanService {
       } catch (storageError) {
         // For now, use a placeholder URL if Firebase Storage is not configured
         // In production, this should be properly configured
-        print('Warning: Firebase Storage upload failed: $storageError');
+        LoggingService.error('Warning: Firebase Storage upload failed: $storageError');
         imageUrl =
             'placeholder://local-image-${DateTime.now().millisecondsSinceEpoch}';
       }
@@ -83,9 +85,11 @@ class ScanService {
   /// Update user statistics after a scan
   static Future<void> _updateUserStats(String userId, int pointsEarned) async {
     final userRef = _firestore.collection('users').doc(userId);
+    final statsRef = _firestore.collection('stats').doc(userId);
 
     await _firestore.runTransaction((transaction) async {
       final userDoc = await transaction.get(userRef);
+      final statsDoc = await transaction.get(statsRef);
 
       if (!userDoc.exists) {
         throw Exception('User document not found');
@@ -129,6 +133,43 @@ class ScanService {
       );
 
       transaction.update(userRef, updatedUser.toJson());
+
+      // Update stats document
+      Map<String, dynamic> currentStats;
+      if (statsDoc.exists) {
+        currentStats = statsDoc.data()!;
+      } else {
+        // Initialize stats with user's existing data
+        currentStats = {
+          'totalPoints': user.totalPoints,  // Use existing points
+          'totalScans': 0,  // Start from 0 for new stats
+          'currentStreak': user.streakCount,  // Use existing streak
+          'longestStreak': user.streakCount,  // Initialize with current streak
+          'weeklyProgress': List<int>.filled(7, 0),
+          'categoryBreakdown': {
+            'Recyclable': 0,
+            'Compostable': 0,
+            'Hazardous': 0,
+            'Landfill': 0,
+          }
+        };
+      }
+
+      // Update stats
+      currentStats['totalPoints'] = (currentStats['totalPoints'] as int) + pointsEarned;
+      currentStats['totalScans'] = (currentStats['totalScans'] as int) + 1;
+      currentStats['currentStreak'] = newStreak;
+      currentStats['longestStreak'] = newStreak > (currentStats['longestStreak'] as int) 
+          ? newStreak 
+          : currentStats['longestStreak'];
+
+      // Update weekly progress
+      List<int> weeklyProgress = List<int>.from(currentStats['weeklyProgress']);
+      int dayIndex = DateTime.now().weekday - 1; // 0 = Monday, 6 = Sunday
+      weeklyProgress[dayIndex] = weeklyProgress[dayIndex] + 1;
+      currentStats['weeklyProgress'] = weeklyProgress;
+
+      transaction.set(statsRef, currentStats, SetOptions(merge: true));
     });
   }
 
@@ -451,7 +492,7 @@ class ScanService {
         return Map<String, String>.from(data);
       }
     } catch (e) {
-      print('Error fetching disposal rules: $e');
+      LoggingService.error('Error fetching disposal rules: $e');
     }
 
     // Default rules for Kigali
@@ -519,4 +560,45 @@ class ScanService {
 
     await _firestore.collection('rules').doc('kigali').set(kigaliRules);
   }
+
+  /// Temporary method to debug user stats document
+// static Future<void> debugUserStats(String userId) async {
+//   try {
+//     final statsRef = _firestore.collection('stats').doc(userId);
+//     final userRef = _firestore.collection('users').doc(userId);
+    
+//     final statsDoc = await statsRef.get();
+//     final userDoc = await userRef.get();
+
+//     if (userDoc.exists && !statsDoc.exists) {
+//       // If user exists but stats don't, initialize stats
+//       final userData = userDoc.data()!;
+//       final user = EnhancedUserModel.fromJson(userData);
+      
+//       final initialStats = {
+//         'totalPoints': user.totalPoints,
+//         'totalScans': 0,
+//         'currentStreak': user.streakCount,
+//         'longestStreak': user.streakCount,
+//         'weeklyProgress': List<int>.filled(7, 0),
+//         'categoryBreakdown': {
+//           'Recyclable': 0,
+//           'Compostable': 0,
+//           'Hazardous': 0,
+//           'Landfill': 0,
+//         }
+//       };
+      
+//       await statsRef.set(initialStats);
+//       debugPrint('Initialized stats for user: $userId with data from users collection');
+//     }
+
+//     final updatedStatsDoc = await statsRef.get();
+//     debugPrint('User stats: ${updatedStatsDoc.data()}');
+//     debugPrint('User data: ${userDoc.data()}');
+//   } catch (e) {
+//     debugPrint('Error managing user stats: $e');
+//   }
+
+// }
 }

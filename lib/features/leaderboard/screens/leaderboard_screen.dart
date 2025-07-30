@@ -95,7 +95,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 fontSize: 16,
               ),
               indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(),
                 borderRadius: BorderRadius.circular(25),
               ),
               dividerColor: Colors.transparent,
@@ -146,7 +146,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -306,20 +306,20 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            gradientColors[index][0].withOpacity(0.15),
-            gradientColors[index][1].withOpacity(0.05),
+            gradientColors[index][0].withValues(alpha: 0.15),
+            gradientColors[index][1].withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colors[index].withOpacity(0.3),
+          color: colors[index].withValues(alpha: 0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: colors[index].withOpacity(0.1),
+            color: colors[index].withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -334,10 +334,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: colors[index].withOpacity(0.1),
+                  color: colors[index].withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: colors[index].withOpacity(0.5),
+                    color: colors[index].withValues(alpha: 0.5),
                     width: 2,
                   ),
                 ),
@@ -385,7 +385,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Icon(
                       Icons.star_rounded,
                       size: 16,
-                      color: colors[index].withOpacity(0.8),
+                      color: colors[index].withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -445,10 +445,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                 width: 1.5,
               ),
             ),
@@ -543,7 +543,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -558,7 +558,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),

@@ -24,7 +24,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   bool _isLoading = false;
   String? _error;
   final ImagePicker _imagePicker = ImagePicker();
-  String _currentLocation = 'Kigali'; // Default location
 
   @override
   void initState() {
@@ -51,7 +50,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       
       // In a real app, you'd reverse geocode this to get city name
       setState(() {
-        _currentLocation = 'Kigali'; // For now, using default
       });
     } catch (e) {
       LoggingService.locationError('Failed to get location', e);
@@ -111,7 +109,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           await _cameraController!.setFlashMode(FlashMode.auto);
         } catch (e) {
           // Flash might not be available on all devices
-          print('Flash not available: $e');
+          LoggingService.error('Flash not available: $e');
         }
 
         if (mounted) {
@@ -469,7 +467,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                           // Flash Toggle (placeholder for now)
                           GestureDetector(
                             onTap: () {
-                              // TODO: Implement flash toggle
+                              // Flash toggle functionality can be implemented here
+                              LoggingService.info('Flash toggle pressed');
                             },
                             child: Container(
                               width: 60,
