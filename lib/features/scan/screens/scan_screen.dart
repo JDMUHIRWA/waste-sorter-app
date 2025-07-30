@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../providers/app_providers.dart';
+import '../../../services/logging_service.dart';
+
 
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
@@ -25,33 +29,71 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   void initState() {
     super.initState();
     _initializeCamera();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      LoggingService.locationInfo('Requesting location permissions...');
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        final requested = await Geolocator.requestPermission();
+        if (requested == LocationPermission.denied) {
+          LoggingService.locationInfo('Location permission denied');
+          return; // Use default location
+        }
+      }
+
+      LoggingService.locationInfo('Getting current position...');
+      final position = await Geolocator.getCurrentPosition();
+      LoggingService.locationInfo('Position obtained: $position');
+      
+      // In a real app, you'd reverse geocode this to get city name
+      setState(() {
+      });
+    } catch (e) {
+      LoggingService.locationError('Failed to get location', e);
+      // Use default location if GPS fails
+    }
   }
 
   Future<void> _initializeCamera() async {
     try {
-      // Check and request camera permission
-      final cameraPermission = await Permission.camera.status;
-      if (cameraPermission != PermissionStatus.granted) {
-        final result = await Permission.camera.request();
-        if (result != PermissionStatus.granted) {
-          setState(() {
-            _error = 'Camera permission is required to scan waste items';
-          });
-          return;
+      LoggingService.cameraInfo('Initializing camera...');
+      
+      // Handle permissions differently for web and mobile
+      if (kIsWeb) {
+        // For web, we don't use permission_handler. The browser will handle permissions
+        LoggingService.cameraInfo('Running on web, browser will handle permissions');
+      } else {
+        // Mobile permission handling
+        final cameraPermission = await Permission.camera.status;
+        if (cameraPermission != PermissionStatus.granted) {
+          final result = await Permission.camera.request();
+          if (result != PermissionStatus.granted) {
+            LoggingService.cameraError('Camera permission denied');
+            setState(() {
+              _error = 'Camera permission is required to scan waste items';
+            });
+            return;
+          }
         }
       }
 
+      LoggingService.cameraInfo('Getting available cameras...');
       _cameras = await availableCameras();
       if (_cameras!.isNotEmpty) {
+        LoggingService.cameraInfo('Found ${_cameras!.length} cameras');
         // Use the back camera (usually index 0) for better scanning
         final backCamera = _cameras!.firstWhere(
           (camera) => camera.lensDirection == CameraLensDirection.back,
           orElse: () => _cameras![0],
         );
 
+        LoggingService.cameraInfo('Initializing camera controller...');
         _cameraController = CameraController(
           backCamera,
-          ResolutionPreset.medium, // Reduced from high to prevent buffer issues
+          ResolutionPreset.high,
           enableAudio: false,
           imageFormatGroup: ImageFormatGroup.jpeg,
         );
@@ -67,7 +109,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           await _cameraController!.setFlashMode(FlashMode.auto);
         } catch (e) {
           // Flash might not be available on all devices
-          print('Flash not available: $e');
+          LoggingService.error('Flash not available: $e');
         }
 
         if (mounted) {
@@ -138,6 +180,31 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     });
 
     try {
+      if (!kIsWeb) {
+        // Mobile permission handling
+        LoggingService.info('Checking storage permissions...');
+        final storageStatus = await Permission.storage.status;
+        final photosStatus = await Permission.photos.status;
+        
+        if (!storageStatus.isGranted || !photosStatus.isGranted) {
+          LoggingService.info('Requesting storage permissions...');
+          // Request permissions
+          final storageResult = await Permission.storage.request();
+          final photosResult = await Permission.photos.request();
+          
+          if (!storageResult.isGranted || !photosResult.isGranted) {
+            LoggingService.error('Storage permission denied');
+            setState(() {
+              _error = 'Storage permission is required to select images from gallery';
+            });
+            return;
+          }
+        }
+      } else {
+        LoggingService.info('Running on web, browser will handle permissions');
+      }
+
+      LoggingService.info('Opening image picker...');
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
@@ -146,15 +213,26 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       );
 
       if (image != null) {
-        // Verify the image exists and has content
-        if (await image.length() > 0) {
-          // Process the selected image through our backend
-          await _processCapturedImage(image.path);
-        } else {
+        LoggingService.info('Image selected successfully');
+        final fileSize = await image.length();
+        
+        LoggingService.debug('Image details:');
+        LoggingService.debug('- Path: ${image.path}');
+        LoggingService.debug('- File size: $fileSize bytes');
+
+        if (fileSize <= 0) {
+          LoggingService.error('Selected image file is empty');
           setState(() {
-            _error = 'Selected image is empty. Please choose another image.';
+            _error = 'Selected image appears to be empty. Please choose another image.';
           });
+          return;
         }
+
+        // Process the selected image
+        LoggingService.info('Processing selected image...');
+        await _processCapturedImage(image.path);
+      } else {
+        LoggingService.info('No image selected (user cancelled)');
       }
     } catch (e) {
       setState(() {
@@ -389,7 +467,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                           // Flash Toggle (placeholder for now)
                           GestureDetector(
                             onTap: () {
-                              // TODO: Implement flash toggle
+                              // Flash toggle functionality can be implemented here
+                              LoggingService.info('Flash toggle pressed');
                             },
                             child: Container(
                               width: 60,

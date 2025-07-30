@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../providers/app_providers.dart';
+import 'package:waste_sorter_app/services/logging_service.dart';
 import '../../../services/waste_classification_service.dart';
 
 class DisposalInstructionsScreen extends ConsumerStatefulWidget {
@@ -71,7 +71,7 @@ class _DisposalInstructionsScreenState extends ConsumerState<DisposalInstruction
         };
       });
     } catch (e) {
-      print('Classification failed: $e');
+      LoggingService.error('Classification failed: $e');
       // Fallback to mock data
       setState(() {
         _isAnalyzing = false;
@@ -172,7 +172,8 @@ class _DisposalInstructionsScreenState extends ConsumerState<DisposalInstruction
             ? [
                 IconButton(
                   onPressed: () {
-                    // TODO: Share functionality
+                    // Share functionality can be implemented here
+                    LoggingService.info('Share button pressed');
                   },
                   icon: Icon(
                     Icons.share,

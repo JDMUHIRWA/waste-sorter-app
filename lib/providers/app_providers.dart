@@ -222,13 +222,7 @@ final recentScansProvider = FutureProvider<List<ScanResultModel>>((ref) async {
 // Today's Points Provider
 final todayPointsProvider = FutureProvider<int>((ref) async {
   final user = await ref.watch(currentUserProvider.future);
-  if (user == null) return 0;
-
-  final now = DateTime.now();
-  final today = DateTime(now.year, now.month, now.day);
-  
-  // This would need to be implemented in ScanService
-  // For now, return 0
+  if (user == null) return 0;  
   return 0;
 });
 

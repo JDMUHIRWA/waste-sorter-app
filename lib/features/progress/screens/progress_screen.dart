@@ -17,6 +17,18 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
 
+  // Helper method to safely calculate percentages
+  double calculatePercentage(int value, int total) {
+    if (total == 0) return 0.0;
+    return (value / total).clamp(0.0, 1.0);
+  }
+
+  // Helper method to safely get weekly progress points
+  int getWeeklyProgressPoints(List<int> progress) {
+    if (progress.isEmpty) return 0;
+    return progress.fold(0, (sum, count) => sum + count * 10);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -32,8 +44,6 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   @override
   Widget build(BuildContext context) {
     final userStatsAsync = ref.watch(userStatsProvider);
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,20 +60,68 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         ),
         elevation: 0,
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: colorScheme.primary,
-          labelColor: Colors.white, // White text for selected tab
-          unselectedLabelColor: colorScheme.onSurface.withValues(alpha: 0.6),
-          indicator: BoxDecoration(
-            color: colorScheme.primary,
-            borderRadius: BorderRadius.circular(25),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(65),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // const Icon(Icons.timeline),
+                      const SizedBox(width: 8),
+                      const Text('Overview'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // const Icon(Icons.eco),
+                      const SizedBox(width: 8),
+                      const Text('Impact'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // const Icon(Icons.history),
+                      const SizedBox(width: 8),
+                      const Text('History'),
+                    ],
+                  ),
+                ),
+              ],
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+              ),
+              indicator: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              dividerColor: Colors.transparent,
+              padding: const EdgeInsets.all(4),
+            ),
           ),
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Impact'),
-            Tab(text: 'History'),
-          ],
         ),
       ),
       body: userStatsAsync.when(
@@ -76,8 +134,39 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                   _buildHistoryTab(),
                 ],
               )
-            : _buildDevelopmentMockData(), // Show mock data for development
-        loading: () => const Center(child: CircularProgressIndicator()),
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.show_chart_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No progress data yet',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Start scanning to track your progress',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
         error: (error, stack) => _buildErrorState(error.toString()),
       ),
     );
@@ -87,50 +176,70 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Key Stats Cards
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  'Total Scans',
-                  stats.totalScans.toString(),
-                  Icons.camera_alt,
-                  AppColors.primary,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.insights,
+                      color: Colors.grey[700],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Key Statistics',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatCard(
-                  'Total Points',
-                  stats.totalPoints.toString(),
-                  Icons.stars,
-                  const Color(0xFFFFB800),
+                const SizedBox(height: 16) ,
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _buildStatCard(
+                      'Total Scans',
+                      stats.totalScans.toString(),
+                      Icons.camera_alt,
+                      AppColors.primary,
+                    ),
+                    _buildStatCard(
+                      'Total Points',
+                      stats.totalPoints.toString(),
+                      Icons.stars,
+                      const Color(0xFFFFB800),
+                    ),
+                    _buildStatCard(
+                      'Current Streak',
+                      '${stats.currentStreak} days',
+                      Icons.local_fire_department,
+                      const Color.fromARGB(255, 253, 127, 1),
+                    ),
+                    // _buildStatCard(
+                    //   'Best Streak',
+                    //   '${stats.longestStreak} days',
+                    //   Icons.emoji_events,
+                    //   const Color(0xFF4CAF50),
+                    // ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  'Current Streak',
-                  '${stats.currentStreak} days',
-                  Icons.local_fire_department,
-                  const Color(0xFFFF6B6B),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatCard(
-                  'Best Streak',
-                  '${stats.longestStreak} days',
-                  Icons.emoji_events,
-                  const Color(0xFF4ECDC4),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -248,43 +357,62 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     );
   }
 
-  Widget _buildStatCard(
-      String title, String value, IconData icon, Color color) {
-    final theme = Theme.of(context);
-
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.cardTheme.color,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withValues(alpha: 0.1),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, 
         children: [
-          Icon(icon, size: 32, color: color),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           Text(
             value,
             style: TextStyle(
               fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
+              fontWeight: FontWeight.w700,
+              color: color.withValues(alpha: 0.8),
+              height: 1.2,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              color: theme.textTheme.bodySmall?.color,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -292,52 +420,119 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   }
 
   Widget _buildWeeklyProgressCard(UserStats stats) {
+    final weeklyPoints = getWeeklyProgressPoints(stats.weeklyProgress);
+    final progressPercentage = calculatePercentage(weeklyPoints, 100);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'This Week',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'This Week',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${stats.weeklyProgress.fold(0, (sum, count) => sum + count * 10)}',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    'Points Earned',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.trending_up,
+                      size: 16,
+                      color: Color(0xFF4CAF50),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '+${stats.weeklyProgress.last * 10}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF4CAF50),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
-          Text(
-            '${stats.weeklyProgress.fold(0, (sum, count) => sum + count * 10)} points earned', // Approximate weekly points
-            style: const TextStyle(
-              fontSize: 16,
-              color: AppColors.textSecondary,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progressPercentage,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              minHeight: 8,
             ),
-          ),
-          const SizedBox(height: 12),
-          LinearProgressIndicator(
-            value: (stats.weeklyProgress
-                    .fold(0, (sum, count) => sum + count * 10)) /
-                100, // Assuming 100 points weekly goal
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
           const SizedBox(height: 8),
           Text(
             'Goal: 100 points/week',
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -346,33 +541,115 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   }
 
   Widget _buildCategoryBreakdownCard(UserStats stats) {
+    // If there are no scans yet, show a placeholder
+    if (stats.totalScans == 0) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.pie_chart_outline,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Category Breakdown',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                'Start scanning to see your waste category breakdown',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show actual breakdown for users with scans
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Category Breakdown',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.pie_chart_outline,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Category Breakdown',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           ...stats.categoryBreakdown.entries.map((entry) {
-            final percentage = (entry.value / stats.totalScans * 100).round();
+            // Avoid division by zero by using a default of 0%
+            final percentage = stats.totalScans > 0
+                ? ((entry.value / stats.totalScans) * 100).round()
+                : 0;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _buildCategoryRow(entry.key, entry.value, percentage),
@@ -386,6 +663,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   Widget _buildCategoryRow(String category, int count, int percentage) {
     Color color;
     IconData icon;
+
+    // Ensure percentage is valid
+    percentage = percentage.clamp(0, 100);
 
     switch (category) {
       case 'Recyclable':
@@ -409,44 +689,85 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         icon = Icons.category;
     }
 
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: color),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    category,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    '$count ($percentage%)',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  size: 18,
+                  color: color,
+                ),
               ),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(
-                value: percentage / 100,
-                backgroundColor: color.withValues(alpha: 0.1),
-                valueColor: AlwaysStoppedAnimation<Color>(color),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      category,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    Text(
+                      '$count items',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Stack(
+            children: [
+              Container(
+                height: 8,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: percentage / 100,
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$percentage%',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -456,31 +777,47 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Recent Achievements',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.emoji_events,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Recent Achievements',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          _buildAchievementRow(
-              '🎯', 'First Scan', 'Completed your first waste scan'),
+          const SizedBox(height: 20),
+          _buildAchievementRow('🎯', 'First Scan', 'Completed your first waste scan'),
           _buildAchievementRow('🔥', 'Week Warrior', '7-day scanning streak'),
-          _buildAchievementRow(
-              '♻️', 'Recycling Champion', '25 recyclable items scanned'),
+          _buildAchievementRow('♻️', 'Recycling Champion', '25 recyclable items scanned'),
         ],
       ),
     );
@@ -488,18 +825,29 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
 
   Widget _buildAchievementRow(String emoji, String title, String description) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: Colors.grey[50],
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Center(
-              child: Text(emoji, style: const TextStyle(fontSize: 24)),
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 24),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -509,17 +857,18 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Colors.grey[800],
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
@@ -700,31 +1049,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     );
   }
 
-  Widget _buildDevelopmentMockData() {
-    // Create mock stats for development/demo purposes
-    final mockStats = UserStats(
-      totalScans: 45,
-      totalPoints: 215,
-      currentStreak: 7,
-      longestStreak: 12,
-      weeklyProgress: [3, 2, 4, 6, 5, 3, 7], // Last 7 days
-      categoryBreakdown: {
-        'Recyclable': 25,
-        'Compostable': 12,
-        'Hazardous': 3,
-        'Landfill': 5,
-      },
-    );
 
-    return TabBarView(
-      controller: _tabController,
-      children: [
-        _buildOverviewTab(mockStats),
-        _buildImpactTab(mockStats),
-        _buildHistoryTab(),
-      ],
-    );
-  }
 
   Widget _buildErrorState(String error) {
     return Center(
