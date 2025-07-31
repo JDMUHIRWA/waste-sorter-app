@@ -149,7 +149,7 @@ class AppRadius {
   static const double lg = 12.0;
   static const double xl = 16.0;
   static const double xxl = 24.0;
-  static const double circular = 999.0;
+  static const double circular = 99.0;
 }
 
 class AppShadows {
