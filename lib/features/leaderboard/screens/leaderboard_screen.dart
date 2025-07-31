@@ -85,7 +85,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               labelColor: Theme.of(context).colorScheme.primary,
               unselectedLabelColor: Colors.grey,
               indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.primary,
