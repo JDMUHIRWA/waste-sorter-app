@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
-import 'logging_service.dart';
+import 'package:waste_sorter_app/services/logging_service.dart';
 
 class FirebaseStorageService {
   static final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -19,7 +19,6 @@ class FirebaseStorageService {
         if (e.toString().contains('object-not-found')) {
           return; // This is expected for a non-existent test file
         }
-        rethrow; // Re-throw other errors
       }
     } catch (e) {
       throw Exception('Firebase Storage not properly configured: $e');
