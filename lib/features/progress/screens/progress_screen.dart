@@ -104,7 +104,14 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               ],
               labelColor: Theme.of(context).colorScheme.primary,
               unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicator: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -114,10 +121,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                 fontWeight: FontWeight.normal,
                 fontSize: 16,
               ),
-              indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(25),
-              ),
+
               dividerColor: Colors.transparent,
               padding: const EdgeInsets.all(4),
             ),
@@ -206,11 +210,14 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 16) ,
+                const SizedBox(height: 16),
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
                   children: [
                     _buildStatCard(
                       'Total Scans',
@@ -219,23 +226,23 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                       AppColors.primary,
                     ),
                     _buildStatCard(
-                      'Total Points',
+                      'All Points',
                       stats.totalPoints.toString(),
                       Icons.stars,
                       const Color(0xFFFFB800),
                     ),
                     _buildStatCard(
-                      'Current Streak',
+                      'On a Streak',
                       '${stats.currentStreak} days',
                       Icons.local_fire_department,
                       const Color.fromARGB(255, 253, 127, 1),
                     ),
-                    // _buildStatCard(
-                    //   'Best Streak',
-                    //   '${stats.longestStreak} days',
-                    //   Icons.emoji_events,
-                    //   const Color(0xFF4CAF50),
-                    // ),
+                    _buildStatCard(
+                      'Best Streak',
+                      '${stats.longestStreak} days',
+                      Icons.emoji_events,
+                      const Color(0xFF4CAF50),
+                    ),
                   ],
                 ),
               ],
@@ -390,10 +397,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                 child: Icon(
                   icon,
                   color: color,
-                  size: 20,
+                  size: 15,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 title,
                 style: TextStyle(

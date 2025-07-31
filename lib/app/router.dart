@@ -17,7 +17,7 @@ import '../features/progress/screens/progress_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/leaderboard',
   debugLogDiagnostics: true,
   routes: [
     GoRoute(

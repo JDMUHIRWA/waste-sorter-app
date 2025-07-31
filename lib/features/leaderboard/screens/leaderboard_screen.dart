@@ -84,7 +84,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               ],
               labelColor: Theme.of(context).colorScheme.primary,
               unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicator: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -94,10 +101,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 fontWeight: FontWeight.normal,
                 fontSize: 16,
               ),
-              indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(),
-                borderRadius: BorderRadius.circular(25),
-              ),
+
               dividerColor: Colors.transparent,
               padding: const EdgeInsets.all(4),
             ),
